@@ -1,1 +1,35 @@
-<p>login works!</p>
+<div class="login-container">
+  <div class="login-card">
+    <!-- Logo/Icono de la aplicación -->
+    <div class="logo-section">
+      <i class="pi pi-heart logo-icon"></i>
+      <h1 class="logo-text">Vet-Link</h1>
+      <p class="logo-subtitle">Sistema de Gestión Veterinaria</p>
+    </div>
+
+    <!-- Botón de inicio de sesión -->
+    <button
+      class="login-button"
+      (click)="handleLogin()"
+      [disabled]="isLoading()"
+      [class.loading]="isLoading()"
+    >
+      <!-- Contenido normal -->
+      <span *ngIf="!isLoading()" class="button-text">
+        Iniciar sesión
+      </span>
+
+      <!-- Spinner de carga -->
+      <span *ngIf="isLoading()" class="spinner-container">
+        <span class="spinner"></span>
+        <span class="loading-text">Verificando...</span>
+      </span>
+    </button>
+
+    <!-- Pie de página -->
+    <p class="login-footer">
+      Bienvenido a Vet-Link
+    </p>
+  </div>
+</div>
+
