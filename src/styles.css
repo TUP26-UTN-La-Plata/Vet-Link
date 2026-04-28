@@ -43,9 +43,3 @@ app-root {
   height: 100%;
 }
 
-/* Routed view (Login, Layout) fills space beside <router-outlet> */
-.app-shell > router-outlet + * {
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-}
