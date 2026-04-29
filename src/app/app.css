@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Routed component (Login, Layout, …) fills the column beside <router-outlet> */
+:host > router-outlet + * {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}

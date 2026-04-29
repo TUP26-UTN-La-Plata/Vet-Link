@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host-context(.layout-bottom-nav) {
+  display: flex;
+  flex: 1 1 0%;
+  min-width: 0;
+}
