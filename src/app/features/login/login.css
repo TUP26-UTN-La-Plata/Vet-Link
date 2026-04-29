@@ -35,10 +35,11 @@
   margin-bottom: 50px;
 }
 
-.logo-icon {
-  font-size: 64px;
-  color: var(--color-primary);
-  margin-bottom: 20px;
+.logo-image {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  margin: 0 auto 30px auto;
   display: block;
   animation: pulse 2s ease-in-out infinite;
 }
