@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable, map, of, tap } from "rxjs";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Observable, delay, map, of, tap } from "rxjs";
 import { Patient } from "./patients.interface";
 
 @Injectable({
@@ -30,14 +30,19 @@ export class PatientsService {
 
         console.log('Cache expired or not found. Fetching from API...');
 
-        return this.http.get<Patient[]>(this.API_URL).pipe(
+        const headers = new HttpHeaders({
+            'x-api-key': this.API_KEY
+        });
+
+        return this.http.get<Patient[]>(this.API_URL, { headers }).pipe(
             map((apiData: any[]) => {
                 return apiData.map(item => this.itemToPatient(item));
             }),
             tap(mappedData => {
                 const formattedData = { data: mappedData, timestamp: Date.now() };
                 localStorage.setItem(this.CACHE_LABEL, JSON.stringify(formattedData));
-            })
+            }),
+            delay(0)
         );
     }
 
@@ -45,25 +50,24 @@ export class PatientsService {
         return {
             id: item.id,
             name: item.name,
-            image: item.image.url || 'assets/no-image.png',
+            image: item.image?.url || 'assets/no-image.png',
             description: item.temperament || item.bred_for || 'Sin descripción',
-            averageWeight: this.averageExtraction(item.weight?.metric),
-            averageHeight: this.averageExtraction(item.height?.metric),
+            averageWeight: this.calculateAverage(item.weight?.metric),
+            averageHeight: this.calculateAverage(item.height?.metric),
             origin: item.origin || 'Desconocido',
         };
     }
 
-    private averageExtraction(range: string): number {
+    private calculateAverage(range: string): number {
         if (!range) return 0;
-        const parts = range.split('-').map(val => parseFloat(val.trim()));
 
-        let result = 0;
+        const numbers = range.match(/\d+(\.\d+)?/g)?.map(Number);
 
-        if (parts.length === 2) {
-            result = (parts[0] + parts[1]) / 2;
-        } else {
-            result = parts[0] || 0;
-        }
-        return Number(result.toFixed(0));
+        if (!numbers || numbers.length === 0) return 0;
+
+        const sum = numbers.reduce((acc, val) => acc + val, 0);
+        const avg = sum / numbers.length;
+
+        return Number(avg.toFixed(0));
     }
 }

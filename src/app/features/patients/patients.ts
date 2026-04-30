@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { PatientsService } from './patients.service';
 import { Patient } from './patients.interface';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessageModule } from 'primeng/message';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-patients',
-  imports: [],
+  imports: [ProgressSpinnerModule, MessageModule, CardModule, InputTextModule],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
@@ -12,7 +16,7 @@ export class Patients implements OnInit {
   patients: Patient[] = [];
   filteredPatients: Patient[] = [];
   loading: boolean = false;
-  errorMsj: string | null = null;
+  errorMessage: string | null = null;
 
   constructor(private patientsService: PatientsService) { }
 
@@ -22,17 +26,20 @@ export class Patients implements OnInit {
 
   loadData() {
     this.loading = true;
-    this.errorMsj = null;
+    this.errorMessage = null;
 
     this.patientsService.getPatients().subscribe({
       next: (data) => {
         this.patients = data;
-        this.filteredPatients = data;
-        this.loading = false;
+        this.filteredPatients = [];
+        Promise.resolve().then(() => {
+          this.filteredPatients = [...this.patients];
+          this.loading = false;
+        });
       },
       error: (error) => {
         console.error('Error capturado:', error);
-        this.errorMsj = 'Error al cargar los pacientes';
+        this.errorMessage = 'Error al cargar los pacientes';
         this.loading = false;
       }
     });
