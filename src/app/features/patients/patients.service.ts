@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable, of, tap } from "rxjs";
+import { Observable, map, of, tap } from "rxjs";
 import { Patient } from "./patients.interface";
 
 @Injectable({
@@ -31,10 +31,39 @@ export class PatientsService {
         console.log('Cache expired or not found. Fetching from API...');
 
         return this.http.get<Patient[]>(this.API_URL).pipe(
-            tap(datos => {
-                const entrada = { data: datos, timestamp: Date.now() };
-                localStorage.setItem(this.CACHE_LABEL, JSON.stringify(entrada));
+            map((apiData: any[]) => {
+                return apiData.map(item => this.itemToPatient(item));
+            }),
+            tap(mappedData => {
+                const formattedData = { data: mappedData, timestamp: Date.now() };
+                localStorage.setItem(this.CACHE_LABEL, JSON.stringify(formattedData));
             })
         );
+    }
+
+    private itemToPatient(item: any): Patient {
+        return {
+            id: item.id,
+            name: item.name,
+            image: item.image.url || 'assets/no-image.png',
+            description: item.temperament || item.bred_for || 'Sin descripción',
+            averageWeight: this.averageExtraction(item.weight?.metric),
+            averageHeight: this.averageExtraction(item.height?.metric),
+            origin: item.origin || 'Desconocido',
+        };
+    }
+
+    private averageExtraction(range: string): number {
+        if (!range) return 0;
+        const parts = range.split('-').map(val => parseFloat(val.trim()));
+
+        let result = 0;
+
+        if (parts.length === 2) {
+            result = (parts[0] + parts[1]) / 2;
+        } else {
+            result = parts[0] || 0;
+        }
+        return Number(result.toFixed(0));
     }
 }
