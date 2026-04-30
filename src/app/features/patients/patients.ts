@@ -42,4 +42,21 @@ export class Patients implements OnInit {
     const searchInput = (event.target as HTMLInputElement).value.toLowerCase();
     this.filteredPatients = this.patients.filter(p => p.name.toLowerCase().includes(searchInput));
   }
+
+  orderPatients(property: keyof Patient) {
+    this.filteredPatients.sort((a, b) => {
+      const valueA = a[property];
+      const valueB = b[property];
+
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        return valueA.localeCompare(valueB);
+      }
+
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        return valueA - valueB;
+      }
+
+      return 0;
+    });
+  }
 }
