@@ -1,14 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { PatientsService } from './patients.service';
 import { Patient } from './patients.interface';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { IconFieldModule } from 'primeng/iconfield'
+import { InputIconModule } from 'primeng/inputicon'
+import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-patients',
-  imports: [ProgressSpinnerModule, MessageModule, CardModule, InputTextModule],
+  imports: [ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, FloatLabelModule, IconFieldModule, InputIconModule],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
@@ -18,7 +22,10 @@ export class Patients implements OnInit {
   loading: boolean = false;
   errorMessage: string | null = null;
 
-  constructor(private patientsService: PatientsService) { }
+  constructor(
+    private patientsService: PatientsService,
+    private cd: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.loadData()
@@ -28,19 +35,18 @@ export class Patients implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    this.patientsService.getPatients().subscribe({
+    this.patientsService.getPatients().pipe(delay(2000)).subscribe({
       next: (data) => {
         this.patients = data;
-        this.filteredPatients = [];
-        Promise.resolve().then(() => {
-          this.filteredPatients = [...this.patients];
-          this.loading = false;
-        });
+        this.filteredPatients = [...data];
+        this.loading = false;
+        this.cd.detectChanges();
       },
       error: (error) => {
         console.error('Error capturado:', error);
         this.errorMessage = 'Error al cargar los pacientes';
         this.loading = false;
+        this.cd.detectChanges();
       }
     });
   }

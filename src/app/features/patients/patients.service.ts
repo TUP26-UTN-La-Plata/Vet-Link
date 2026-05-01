@@ -42,7 +42,6 @@ export class PatientsService {
                 const formattedData = { data: mappedData, timestamp: Date.now() };
                 localStorage.setItem(this.CACHE_LABEL, JSON.stringify(formattedData));
             }),
-            delay(0)
         );
     }
 
