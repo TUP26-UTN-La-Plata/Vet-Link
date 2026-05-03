@@ -1,18 +1,19 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { PatientsService } from './patients.service';
 import { Patient } from './patients.interface';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { IconFieldModule } from 'primeng/iconfield'
 import { InputIconModule } from 'primeng/inputicon'
+import { SelectModule, SelectChangeEvent } from 'primeng/select';
 import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-patients',
-  imports: [ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, FloatLabelModule, IconFieldModule, InputIconModule],
+  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, SelectModule],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
@@ -21,6 +22,15 @@ export class Patients implements OnInit {
   filteredPatients: Patient[] = [];
   loading: boolean = false;
   errorMessage: string | null = null;
+  sortOptions = [
+    { label: 'Nombre (A-Z) (Por defecto)', value: 'name' },
+    { label: 'Origen', value: 'origin' },
+    { label: 'Peso (Menor a Mayor)', value: 'averageWeight' },
+    { label: 'Altura (Menor a Mayor)', value: 'averageHeight' }
+  ];
+
+  // Variable para el valor seleccionado en el p-select
+  selectedSort: string | null = null;
 
   constructor(
     private patientsService: PatientsService,
@@ -53,10 +63,20 @@ export class Patients implements OnInit {
 
   filterPatients(event: Event): void {
     const searchInput = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredPatients = this.patients.filter(p => p.name.toLowerCase().includes(searchInput));
+
+    this.filteredPatients = this.patients.filter(p =>
+      p.name.toLowerCase().includes(searchInput) ||
+      p.description.toLowerCase().includes(searchInput) ||
+      p.origin.toLowerCase().includes(searchInput) ||
+      p.averageWeight.toString().includes(searchInput) ||
+      p.averageHeight.toString().includes(searchInput)
+    );
   }
 
-  orderPatients(property: keyof Patient) {
+  sortPatients(event: SelectChangeEvent) {
+    const property = event.value as keyof Patient;
+    if (!property) return;
+
     this.filteredPatients.sort((a, b) => {
       const valueA = a[property];
       const valueB = b[property];
