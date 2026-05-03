@@ -9,11 +9,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield'
 import { InputIconModule } from 'primeng/inputicon'
 import { CascadeSelectModule, CascadeSelectChangeEvent } from 'primeng/cascadeselect';
+import { DataViewModule } from 'primeng/dataview';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-patients',
-  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule],
+  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
@@ -56,8 +58,13 @@ export class Patients implements OnInit {
       ]
     }
   ];
-
   selectedSort: any = null;
+
+  layout: 'grid' | 'list' = 'grid';
+  layoutOptions = [
+    { icon: 'pi pi-th-large', value: 'grid' },
+    { icon: 'pi pi-bars', value: 'list' }
+  ];
 
   constructor(
     private patientsService: PatientsService,
