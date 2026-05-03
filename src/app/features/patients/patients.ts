@@ -8,12 +8,12 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield'
 import { InputIconModule } from 'primeng/inputicon'
-import { SelectModule, SelectChangeEvent } from 'primeng/select';
+import { CascadeSelectModule, CascadeSelectChangeEvent } from 'primeng/cascadeselect';
 import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-patients',
-  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, SelectModule],
+  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
@@ -22,15 +22,42 @@ export class Patients implements OnInit {
   filteredPatients: Patient[] = [];
   loading: boolean = false;
   errorMessage: string | null = null;
-  sortOptions = [
-    { label: 'Nombre (A-Z) (Por defecto)', value: 'name' },
-    { label: 'Origen', value: 'origin' },
-    { label: 'Peso (Menor a Mayor)', value: 'averageWeight' },
-    { label: 'Altura (Menor a Mayor)', value: 'averageHeight' }
+  sortOptions: any[] = [
+    {
+      name: 'Nombre',
+      code: 'name',
+      states: [
+        { label: 'A-Z', category: 'Nombre', icon: 'pi pi-sort-alpha-down', value: { prop: 'name', order: 'asc' } },
+        { label: 'Z-A', category: 'Nombre', icon: 'pi pi-sort-alpha-up', value: { prop: 'name', order: 'desc' } }
+      ]
+    },
+    {
+      name: 'Origen',
+      code: 'origin',
+      states: [
+        { label: 'A-Z', category: 'Origen', icon: 'pi pi-sort-alpha-down', value: { prop: 'origin', order: 'asc' } },
+        { label: 'Z-A', category: 'Origen', icon: 'pi pi-sort-alpha-up', value: { prop: 'origin', order: 'desc' } }
+      ]
+    },
+    {
+      name: 'Peso',
+      code: 'weight',
+      states: [
+        { label: 'Menor a Mayor', category: 'Peso', icon: 'pi pi-sort-numeric-down', value: { prop: 'averageWeight', order: 'asc' } },
+        { label: 'Mayor a Menor', category: 'Peso', icon: 'pi pi-sort-numeric-up', value: { prop: 'averageWeight', order: 'desc' } }
+      ]
+    },
+    {
+      name: 'Altura',
+      code: 'height',
+      states: [
+        { label: 'Menor a Mayor', category: 'Altura', icon: 'pi pi-sort-numeric-down', value: { prop: 'averageHeight', order: 'asc' } },
+        { label: 'Mayor a Menor', category: 'Altura', icon: 'pi pi-sort-numeric-up', value: { prop: 'averageHeight', order: 'desc' } }
+      ]
+    }
   ];
 
-  // Variable para el valor seleccionado en el p-select
-  selectedSort: string | null = null;
+  selectedSort: any = null;
 
   constructor(
     private patientsService: PatientsService,
@@ -73,20 +100,37 @@ export class Patients implements OnInit {
     );
   }
 
-  sortPatients(event: SelectChangeEvent) {
-    const property = event.value as keyof Patient;
-    if (!property) return;
+  sortPatients(event: CascadeSelectChangeEvent) {
+    const selection = event.value;
+
+    if (!selection || !selection.value) {
+      this.selectedSort = null;
+      this.filteredPatients = [...this.patients];
+      return;
+    }
+
+    const { prop, order } = selection.value;
 
     this.filteredPatients.sort((a, b) => {
-      const valueA = a[property];
-      const valueB = b[property];
+      const valueA = a[prop as keyof Patient];
+      const valueB = b[prop as keyof Patient];
 
-      if (typeof valueA === 'string' && typeof valueB === 'string') {
-        return valueA.localeCompare(valueB);
+      if (order === 'asc') {
+        if (typeof valueA === 'string' && typeof valueB === 'string') {
+          return valueA.localeCompare(valueB);
+        }
+        if (typeof valueA === 'number' && typeof valueB === 'number') {
+          return valueA - valueB;
+        }
       }
 
-      if (typeof valueA === 'number' && typeof valueB === 'number') {
-        return valueA - valueB;
+      else if (order === 'desc') {
+        if (typeof valueA === 'string' && typeof valueB === 'string') {
+          return valueB.localeCompare(valueA);
+        }
+        if (typeof valueA === 'number' && typeof valueB === 'number') {
+          return valueB - valueA;
+        }
       }
 
       return 0;

@@ -1,7 +1,7 @@
 <div class="flex flex-col">
     <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-bold text-neutral">Gestión de Pacientes</h1>
-        <p class="text-sm text-muted">Consulta y filtra la base de datos de razas caninas.</p>
+        <p class="text-sm text-muted">Consulta y filtra la lista de pacientes.</p>
     </div>
 
     <div class="sticky top-0 z-10 pt-2 pb-4">
@@ -15,12 +15,27 @@
                 </p-iconfield>
             </div>
 
-            <!-- Selector de Ordenamiento -->
-            <div class="w-full md:w-64">
-                <p-select [options]="sortOptions" [(ngModel)]="selectedSort" optionLabel="label" optionValue="value"
-                    [showClear]="true" placeholder="Ordenar por..." (onChange)="sortPatients($event)"
-                    class="w-full !bg-card !border-3 border-neutral/20 rounded-xl h-[46px] flex items-center">
-                </p-select>
+            <div class="w-full md:w-64 md:mr-40">
+                <p-cascadeSelect [(ngModel)]="selectedSort" [options]="sortOptions" [optionGroupChildren]="['states']"
+                    optionLabel="label" optionGroupLabel="name" placeholder="Ordenar por..." [showClear]="true"
+                    (onChange)="sortPatients($event)" appendTo="body"
+                    class="w-full bg-card !border-3 border-neutral/20 rounded-xl h-[46px] flex items-center" [pt]="{
+        option: { class: 'relative' },
+        optionList: { class: 'relative' },
+        overlay: { class: '!top-0' }
+    }">
+
+                    <ng-template pTemplate="value" let-selectedOption>
+                        @if (selectedOption) {
+                        <div class="flex items-center gap-1 text-sm">
+                            <span class="text-neutral">{{ selectedOption.category }}</span>
+                            <i [class]="selectedOption.icon" class="text-neutral/60 text-xs ml-1"></i>
+                        </div>
+                        } @else {
+                        <span class="text-muted text-sm ml-2">Ordenar por...</span>
+                        }
+                    </ng-template>
+                </p-cascadeSelect>
             </div>
         </div>
     </div>
