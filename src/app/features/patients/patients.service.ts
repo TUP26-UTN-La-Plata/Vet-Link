@@ -46,11 +46,15 @@ export class PatientsService {
     }
 
     private itemToPatient(item: any): Patient {
+        const imageUrl = item.image?.url ||
+            (item.reference_image_id
+                ? `https://cdn2.thedogapi.com/images/${item.reference_image_id}.jpg`
+                : 'no-image.webp');
         return {
             id: item.id,
             name: item.name,
-            image: item.image?.url || 'assets/no-image.png',
-            description: item.temperament || item.bred_for || 'Sin descripción',
+            image: imageUrl,
+            description: item.description || item.temperament || item.bred_for || 'Sin descripción',
             averageWeight: this.calculateAverage(item.weight?.metric),
             averageHeight: this.calculateAverage(item.height?.metric),
             origin: item.origin || 'Desconocido',

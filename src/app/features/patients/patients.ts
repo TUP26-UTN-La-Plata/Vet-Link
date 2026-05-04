@@ -88,8 +88,12 @@ export class Patients implements OnInit {
       },
       error: (error) => {
         console.error('Error capturado:', error);
-        this.errorMessage = 'Error al cargar los pacientes';
+
+        this.errorMessage = 'Lo sentimos, no pudimos sincronizar los datos con Vet-Link. Por favor, intenta de nuevo más tarde.';
+
         this.loading = false;
+
+        this.cd.markForCheck();
         this.cd.detectChanges();
       }
     });
@@ -113,34 +117,28 @@ export class Patients implements OnInit {
     if (!selection || !selection.value) {
       this.selectedSort = null;
       this.filteredPatients = [...this.patients];
+      this.cd.detectChanges();
       return;
     }
 
     const { prop, order } = selection.value;
 
-    this.filteredPatients.sort((a, b) => {
+    this.filteredPatients = [...this.filteredPatients].sort((a, b) => {
       const valueA = a[prop as keyof Patient];
       const valueB = b[prop as keyof Patient];
 
-      if (order === 'asc') {
-        if (typeof valueA === 'string' && typeof valueB === 'string') {
-          return valueA.localeCompare(valueB);
-        }
-        if (typeof valueA === 'number' && typeof valueB === 'number') {
-          return valueA - valueB;
-        }
+      let result = 0;
+
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        result = valueA.localeCompare(valueB);
+      } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+        result = valueA - valueB;
       }
 
-      else if (order === 'desc') {
-        if (typeof valueA === 'string' && typeof valueB === 'string') {
-          return valueB.localeCompare(valueA);
-        }
-        if (typeof valueA === 'number' && typeof valueB === 'number') {
-          return valueB - valueA;
-        }
-      }
-
-      return 0;
+      return order === 'asc' ? result : -result;
     });
+
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 }
