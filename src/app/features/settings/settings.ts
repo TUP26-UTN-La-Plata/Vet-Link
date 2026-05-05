@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 import { ConfirmModal } from '../../shared/components/confirm-modal/confirm-modal';
 import { UserAgentCard } from './user-agent-card/user-agent-card';
 import { ProfileCard } from './profile-card/profile-card';
@@ -13,6 +14,7 @@ import { SettingsCard } from './settings-card/settings-card';
 })
 export class Settings {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   protected logoutModalOpen = false;
 
@@ -26,7 +28,7 @@ export class Settings {
 
   protected onLogoutConfirm(): void {
     this.logoutModalOpen = false;
-    sessionStorage.removeItem('vetlink_session');
+    this.authService.logout();
     void this.router.navigate(['/login']);
   }
 }
