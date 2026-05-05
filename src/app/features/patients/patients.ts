@@ -16,6 +16,7 @@ import { delay } from 'rxjs';
 @Component({
   selector: 'app-patients',
   imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule],
+  providers: [PatientsService],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
