@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { ActionButton } from '../../../shared/ui/action-button/action-button';
 
 @Component({
@@ -8,8 +8,9 @@ import { ActionButton } from '../../../shared/ui/action-button/action-button';
   styleUrl: './settings-card.css',
 })
 export class SettingsCard {
-  //TODO: Sign out functionality.
-  onSignOut(): void {
-    console.log('Signing out');
+  readonly logoutRequested = output<void>();
+
+  protected onSignOutClick(): void {
+    this.logoutRequested.emit();
   }
 }

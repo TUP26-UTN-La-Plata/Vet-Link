@@ -9,5 +9,14 @@
     <app-profile-card class="min-w-0" />
     <app-user-agent-card class="min-w-0" />
   </div>
-  <app-settings-card />
+  <app-settings-card (logoutRequested)="onLogoutRequested()" />
+  <app-confirm-modal
+    [visible]="logoutModalOpen"
+    title="¿Cerrar sesión?"
+    message="Estás a punto de salir de tu cuenta en Vet-Link. Deberás volver a ingresar tus credenciales para acceder a los datos de monitoreo de los pacientes."
+    cancelLabel="Cancelar"
+    confirmLabel="Sí, cerrar sesión"
+    (confirmed)="onLogoutConfirm()"
+    (cancelled)="onLogoutCancel()"
+  />
 </div>
