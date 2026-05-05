@@ -26,6 +26,7 @@ export class Settings {
 
   protected onLogoutConfirm(): void {
     this.logoutModalOpen = false;
+    sessionStorage.removeItem('vetlink_session');
     void this.router.navigate(['/login']);
   }
 }
