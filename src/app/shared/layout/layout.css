@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--color-main);
+}
+
+@media (min-width: 768px) {
+  :host {
+    flex-direction: row;
+  }
+}

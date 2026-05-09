@@ -1,0 +1,22 @@
+<div class="flex flex-col gap-4">
+  <div>
+    <h1>Configuración y Perfil</h1>
+    <p>Gestiná tu cuenta profesional y revisá los datos técnicos del sistema.</p>
+  </div>
+  <div
+    class="grid w-full grid-cols-1 gap-16 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-stretch"
+  >
+    <app-profile-card class="min-w-0" />
+    <app-user-agent-card class="min-w-0" />
+  </div>
+  <app-settings-card (logoutRequested)="onLogoutRequested()" />
+  <app-confirm-modal
+    [visible]="logoutModalOpen"
+    title="¿Cerrar sesión?"
+    message="Estás a punto de salir de tu cuenta en Vet-Link. Deberás volver a ingresar tus credenciales para acceder a los datos de monitoreo de los pacientes."
+    cancelLabel="Cancelar"
+    confirmLabel="Sí, cerrar sesión"
+    (confirmed)="onLogoutConfirm()"
+    (cancelled)="onLogoutCancel()"
+  />
+</div>
