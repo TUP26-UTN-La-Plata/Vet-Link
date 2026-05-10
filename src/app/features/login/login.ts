@@ -11,6 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class Login implements OnInit {
   isLoading = signal(false);
+  loginError = signal<string | null>(null);
 
   constructor(
     private router: Router,
@@ -20,6 +21,7 @@ export class Login implements OnInit {
   ngOnInit(): void {
     this.checkExistingSession();
   }
+
   private checkExistingSession(): void {
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/patients']);
@@ -27,7 +29,7 @@ export class Login implements OnInit {
   }
 
   handleLogin(): void {
-    if (this.isLoading()) return; // Evita múltiples clics
+    if (this.isLoading()) return;
 
     this.isLoading.set(true);
 
@@ -36,6 +38,25 @@ export class Login implements OnInit {
       this.isLoading.set(false);
       this.router.navigate(['/patients']);
     }, 2000);
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    if (this.isLoading()) return;
+
+    this.isLoading.set(true);
+    this.loginError.set(null);
+
+    try {
+      await this.authService.loginWithGoogle();
+      this.isLoading.set(false);
+      this.router.navigate(['/patients']);
+    } catch (error: any) {
+      this.isLoading.set(false);
+      this.loginError.set(
+        error?.message || 'Error al iniciar sesión con Google'
+      );
+      console.error('Error en login con Google:', error);
+    }
   }
 }
 
