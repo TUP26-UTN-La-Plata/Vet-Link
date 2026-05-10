@@ -1,14 +1,22 @@
 <div class="flex h-full min-h-0 w-full flex-col rounded-xl bg-card shadow-md">
   <div class="flex w-full flex-row justify-between gap-4 border-b-2 border-neutral/20 p-4 pb-4">
     <div class="flex justify-center items-center w-32">
-      <img src="/avatar.webp" alt="Avatar" class="h-16 w-16 rounded-full">
+      <img
+        [src]="currentUser()?.photoURL || '/avatar.webp'"
+        alt="Avatar"
+        class="h-16 w-16 rounded-full"
+      >
     </div>
     <div class="flex flex-col justify-center items-start w-full">
-      <h4>Dr. Alejandro Méndez</h4>
-      <div class="flex flex-row justify-start items-center gap-2">
-        <i class="pi pi-pencil" ></i>
-        <p>Veterinario</p>
-      </div>
+      <h4>
+        {{ currentUser()?.displayName || currentUser()?.email || 'Usuario' }}
+      </h4>
+      <p *ngIf="currentUser()?.email" class="text-sm text-muted">
+        {{ currentUser()?.email }}
+      </p>
+      <p *ngIf="!currentUser()?.email" class="text-sm text-muted">
+        Usuario conectado
+      </p>
     </div>
     <div class="flex justify-center items-start w-72">
       <app-action-button
