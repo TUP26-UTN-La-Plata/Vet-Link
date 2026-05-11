@@ -17,14 +17,7 @@ export class Login implements OnInit {
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
-    this.checkExistingSession();
-  }
-  private checkExistingSession(): void {
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/patients']);
-    }
-  }
+  ngOnInit(): void {}
 
   handleLogin(): void {
     if (this.isLoading()) return; // Evita múltiples clics
