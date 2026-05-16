@@ -13,18 +13,24 @@ export class Login implements OnInit {
   isLoading = signal(false);
   loginError = signal<string | null>(null);
 
-  constructor(
-    private router: Router,
-    private authService: AuthService
-  ) {}
+  #router: Router;
+  #authService: AuthService;
 
-  ngOnInit(): void {
-    this.checkExistingSession();
+  constructor(
+    router: Router,
+    authService: AuthService
+  ) {
+    this.#router = router;
+    this.#authService = authService;
   }
 
-  private checkExistingSession(): void {
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/patients']);
+  ngOnInit(): void {
+    this.#checkExistingSession();
+  }
+
+  #checkExistingSession(): void {
+    if (this.#authService.isLoggedIn()) {
+      this.#router.navigate(['/patients']);
     }
   }
 
@@ -34,9 +40,9 @@ export class Login implements OnInit {
     this.isLoading.set(true);
 
     setTimeout(() => {
-      this.authService.login();
+      this.#authService.login();
       this.isLoading.set(false);
-      this.router.navigate(['/patients']);
+      this.#router.navigate(['/patients']);
     }, 2000);
   }
 
@@ -47,9 +53,9 @@ export class Login implements OnInit {
     this.loginError.set(null);
 
     try {
-      await this.authService.loginWithGoogle();
+      await this.#authService.loginWithGoogle();
       this.isLoading.set(false);
-      this.router.navigate(['/patients']);
+      this.#router.navigate(['/patients']);
     } catch (error: any) {
       this.isLoading.set(false);
       this.loginError.set(

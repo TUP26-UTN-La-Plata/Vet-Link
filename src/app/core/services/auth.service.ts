@@ -22,18 +22,18 @@ export interface SessionData {
   providedIn: 'root',
 })
 export class AuthService {
-  private sessionKey = 'vetlink_session';
+  #sessionKey = 'vetlink_session';
   isAuthenticated = signal(false);
   currentUser = signal<SessionData | null>(null);
-  private auth = getAuth(initializeApp(firebaseConfig));
+  #auth = getAuth(initializeApp(firebaseConfig));
 
   constructor() {
-    this.initializeFirebase();
-    this.checkSession();
+    this.#initializeFirebase();
+    this.#checkSession();
   }
 
-  private initializeFirebase(): void {
-    onAuthStateChanged(this.auth, (firebaseUser) => {
+  #initializeFirebase(): void {
+    onAuthStateChanged(this.#auth, (firebaseUser) => {
       if (firebaseUser) {
         const sessionData: SessionData = {
           userId: firebaseUser.uid,
@@ -43,7 +43,7 @@ export class AuthService {
           loginTime: new Date().toISOString(),
           isAuthenticated: true,
         };
-        sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+        sessionStorage.setItem(this.#sessionKey, JSON.stringify(sessionData));
         this.isAuthenticated.set(true);
         this.currentUser.set(sessionData);
       } else {
@@ -52,8 +52,8 @@ export class AuthService {
     });
   }
 
-  private checkSession(): void {
-    const session = sessionStorage.getItem(this.sessionKey);
+  #checkSession(): void {
+    const session = sessionStorage.getItem(this.#sessionKey);
     if (session) {
       try {
         const sessionData = JSON.parse(session);
@@ -69,7 +69,7 @@ export class AuthService {
   async loginWithGoogle(): Promise<void> {
     try {
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(this.auth, provider);
+      const result = await signInWithPopup(this.#auth, provider);
       const user = result.user;
 
       const sessionData: SessionData = {
@@ -81,7 +81,7 @@ export class AuthService {
         isAuthenticated: true,
       };
 
-      sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+      sessionStorage.setItem(this.#sessionKey, JSON.stringify(sessionData));
       this.isAuthenticated.set(true);
       this.currentUser.set(sessionData);
     } catch (error) {
@@ -91,7 +91,7 @@ export class AuthService {
   }
 
   getSession(): SessionData | null {
-    const session = sessionStorage.getItem(this.sessionKey);
+    const session = sessionStorage.getItem(this.#sessionKey);
     if (session) {
       try {
         return JSON.parse(session);
@@ -110,13 +110,13 @@ export class AuthService {
       isAuthenticated: true,
     };
 
-    sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+    sessionStorage.setItem(this.#sessionKey, JSON.stringify(sessionData));
     this.isAuthenticated.set(true);
     this.currentUser.set(sessionData);
   }
 
   logout(): void {
-    signOut(this.auth)
+    signOut(this.#auth)
       .then(() => {
         this.clearSession();
       })
@@ -130,7 +130,7 @@ export class AuthService {
   }
 
   private clearSession(): void {
-    sessionStorage.removeItem(this.sessionKey);
+    sessionStorage.removeItem(this.#sessionKey);
     this.isAuthenticated.set(false);
   }
 }

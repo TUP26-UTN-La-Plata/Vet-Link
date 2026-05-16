@@ -7,21 +7,24 @@ import { Patient } from "./patients.interface";
     providedIn: 'root'
 })
 export class PatientsService {
-    private readonly API_URL = 'https://api.thedogapi.com/v1/breeds';
-    private readonly API_KEY = 'live_ePinWLFEmQECQTjlVDJ8yZQ6f3j8c92HdxPwQKwMKgO6cEdnoETYF2Q2ojviwcUa';
-    private readonly CACHE_LABEL = 'patients_cache';
-    private readonly CACHE_LIFETIME = 5 * 60 * 1000;
+    readonly #API_URL = 'https://api.thedogapi.com/v1/breeds';
+    readonly #API_KEY = 'live_ePinWLFEmQECQTjlVDJ8yZQ6f3j8c92HdxPwQKwMKgO6cEdnoETYF2Q2ojviwcUa';
+    readonly #CACHE_LABEL = 'patients_cache';
+    readonly #CACHE_LIFETIME = 5 * 60 * 1000;
 
-    constructor(private http: HttpClient) {
+    #http: HttpClient;
+
+    constructor(http: HttpClient) {
+        this.#http = http;
         console.log('Patients Service initialized');
     }
 
     getPatients(): Observable<Patient[]> {
-        const cache: string | null = localStorage.getItem(this.CACHE_LABEL);
+        const cache: string | null = localStorage.getItem(this.#CACHE_LABEL);
 
         if (cache) {
             const { data, timestamp } = JSON.parse(cache);
-            const isValid = (Date.now() - timestamp) < this.CACHE_LIFETIME
+            const isValid = (Date.now() - timestamp) < this.#CACHE_LIFETIME
             if (isValid) {
                 console.log('Using data from cache');
                 return of(data);
@@ -31,21 +34,21 @@ export class PatientsService {
         console.log('Cache expired or not found. Fetching from API...');
 
         const headers = new HttpHeaders({
-            'x-api-key': this.API_KEY
+            'x-api-key': this.#API_KEY
         });
 
-        return this.http.get<Patient[]>(this.API_URL, { headers }).pipe(
+        return this.#http.get<Patient[]>(this.#API_URL, { headers }).pipe(
             map((apiData: any[]) => {
-                return apiData.map(item => this.itemToPatient(item));
+                return apiData.map(item => this.#itemToPatient(item));
             }),
             tap(mappedData => {
                 const formattedData = { data: mappedData, timestamp: Date.now() };
-                localStorage.setItem(this.CACHE_LABEL, JSON.stringify(formattedData));
+                localStorage.setItem(this.#CACHE_LABEL, JSON.stringify(formattedData));
             }),
         );
     }
 
-    private itemToPatient(item: any): Patient {
+    #itemToPatient(item: any): Patient {
         const imageUrl = item.image?.url ||
             (item.reference_image_id
                 ? `https://cdn2.thedogapi.com/images/${item.reference_image_id}.jpg`
@@ -55,13 +58,13 @@ export class PatientsService {
             name: item.name,
             image: imageUrl,
             description: item.description || item.temperament || item.bred_for || 'Sin descripción',
-            averageWeight: this.calculateAverage(item.weight?.metric),
-            averageHeight: this.calculateAverage(item.height?.metric),
+            averageWeight: this.#calculateAverage(item.weight?.metric),
+            averageHeight: this.#calculateAverage(item.height?.metric),
             origin: item.origin || 'Desconocido',
         };
     }
 
-    private calculateAverage(range: string): number {
+    #calculateAverage(range: string): number {
         if (!range) return 0;
 
         const numbers = range.match(/\d+(\.\d+)?/g)?.map(Number);
