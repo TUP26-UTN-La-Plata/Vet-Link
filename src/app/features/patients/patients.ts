@@ -110,7 +110,7 @@ export class Patients implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    this.patientsService.getPatients().pipe(delay(2000)).subscribe({
+    this.patientsService.getPatients().subscribe({
       next: (data) => {
         this.patients = data;
         this.filteredPatients = [...data];
