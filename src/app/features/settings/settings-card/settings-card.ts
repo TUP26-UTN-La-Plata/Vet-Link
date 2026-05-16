@@ -1,5 +1,5 @@
 import { Component, output } from '@angular/core';
-import { ActionButton } from '../../../shared/ui/action-button/action-button';
+import { ActionButton } from '@shared/ui/action-button/action-button';
 
 @Component({
   selector: 'app-settings-card',

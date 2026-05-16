@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,16 +12,21 @@ import { AuthService } from '../../core/services/auth.service';
 export class Login implements OnInit {
   isLoading = signal(false);
   loginError = signal<string | null>(null);
+  #hasAttemptedLogin = signal(false);
 
-  #router: Router;
-  #authService: AuthService;
+  #router = inject(Router);
+  #authService = inject(AuthService);
 
-  constructor(
-    router: Router,
-    authService: AuthService
-  ) {
-    this.#router = router;
-    this.#authService = authService;
+  constructor() {
+    effect(() => {
+      const isAuthenticated = this.#authService.isLoggedIn();
+      const hasAttempted = this.#hasAttemptedLogin();
+
+      if (isAuthenticated && hasAttempted) {
+        this.#router.navigate(['/patients']);
+        this.#hasAttemptedLogin.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -34,35 +39,28 @@ export class Login implements OnInit {
     }
   }
 
-  handleLogin(): void {
-    if (this.isLoading()) return;
-
-    this.isLoading.set(true);
-
-    setTimeout(() => {
-      this.#authService.login();
-      this.isLoading.set(false);
-      this.#router.navigate(['/patients']);
-    }, 2000);
-  }
-
-  async loginWithGoogle(): Promise<void> {
+  async handleLogin(): Promise<void> {
     if (this.isLoading()) return;
 
     this.isLoading.set(true);
     this.loginError.set(null);
 
     try {
+      this.#hasAttemptedLogin.set(true);
       await this.#authService.loginWithGoogle();
-      this.isLoading.set(false);
-      this.#router.navigate(['/patients']);
     } catch (error: any) {
-      this.isLoading.set(false);
+      this.#hasAttemptedLogin.set(false);
       this.loginError.set(
         error?.message || 'Error al iniciar sesión con Google'
       );
-      console.error('Error en login con Google:', error);
+      console.error('Error en login:', error);
+    } finally {
+      this.isLoading.set(false);
     }
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    await this.handleLogin();
   }
 }
 

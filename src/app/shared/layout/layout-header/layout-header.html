@@ -8,9 +8,10 @@
         <i class="pi pi-bell"></i>
         <i class="pi pi-question-circle"></i>
         <img
-          [src]="currentUser()?.photoURL || '/avatar.webp'"
-          [alt]="currentUser()?.displayName || 'Avatar'"
+          [src]="authService.getUserData()?.photoURL || '/avatar.webp'"
+          [alt]="authService.getUserData()?.name || 'Avatar'"
           class="h-8 w-8 rounded-full object-cover"
+          (error)="$event.target.src = '/avatar.webp'"
         />
       </div>
     </div>
