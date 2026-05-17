@@ -12,10 +12,11 @@ import { CascadeSelectModule, CascadeSelectChangeEvent } from 'primeng/cascadese
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { delay } from 'rxjs';
+import { PaginatorModule } from 'primeng/paginator';
 
 @Component({
   selector: 'app-patients',
-  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule],
+  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule, PaginatorModule],
   providers: [PatientsService],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
@@ -61,6 +62,31 @@ export class Patients implements OnInit {
   ];
   selectedSort: any = null;
 
+  first: number = 0;
+  rows: number = 12;
+  paginatorPt: any = {
+    root: {
+      class: '!bg-white/80 !backdrop-blur-md !border !border-neutral/20 !shadow-xl !rounded-full !px-6 !py-1 !flex !items-center !justify-center'
+    },
+    // Nota: Usamos encadenamiento opcional context?.active
+    page: ({ context }: any) => ({
+      class: [
+        '!rounded-full !min-w-[40px] !h-[40px] !flex !items-center !justify-center !transition-all',
+        context?.active
+          ? '!bg-neutral !text-white !font-bold'
+          : '!text-neutral/70 hover:!bg-neutral/10'
+      ].join(' ')
+    }),
+    // Simplificamos los botones de acción
+    nextbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
+    prevbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
+    firstbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
+    lastbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
+    current: {
+      class: 'text-[10px] font-bold uppercase tracking-tighter text-muted mr-4'
+    }
+  };
+
   layout: 'grid' | 'list' = 'grid';
   layoutOptions = [
     { icon: 'pi pi-th-large', value: 'grid' },
@@ -81,6 +107,10 @@ export class Patients implements OnInit {
   ngOnInit(): void {
     this.loadData()
   };
+
+  get paginatedPatients() {
+    return this.filteredPatients.slice(this.first, this.first + this.rows);
+  }
 
   loadData() {
     this.loading = true;
@@ -116,6 +146,14 @@ export class Patients implements OnInit {
       p.averageWeight.toString().includes(searchInput) ||
       p.averageHeight.toString().includes(searchInput)
     );
+
+    this.first = 0;
+  }
+
+  onPageChange(event: any) {
+    this.first = event.first;
+    this.rows = event.rows;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   sortPatients(event: CascadeSelectChangeEvent) {
