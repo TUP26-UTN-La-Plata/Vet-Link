@@ -48,10 +48,10 @@ export class Login implements OnInit {
     try {
       this.#hasAttemptedLogin.set(true);
       await this.#authService.loginWithGoogle();
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.#hasAttemptedLogin.set(false);
       this.loginError.set(
-        error?.message || 'Error al iniciar sesión con Google'
+        error instanceof Error ? error.message : 'Error al iniciar sesión con Google'
       );
       console.error('Error en login:', error);
     } finally {
@@ -63,4 +63,3 @@ export class Login implements OnInit {
     await this.handleLogin();
   }
 }
-
