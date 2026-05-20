@@ -13,29 +13,6 @@
     </div>
     }
 
-    <!-- Botón de inicio de sesión clásico -->
-    <button class="login-button" (click)="handleLogin()" [disabled]="isLoading()" [class.loading]="isLoading()">
-      <!-- Contenido normal -->
-      @if (!isLoading()) {
-      <span class="button-text">
-        Iniciar sesión
-      </span>
-      }
-
-      <!-- Spinner de carga -->
-      @if (isLoading()) {
-      <span class="spinner-container">
-        <span class="spinner"></span>
-        <span class="loading-text">Verificando...</span>
-      </span>
-      }
-    </button>
-
-    <!-- Separador -->
-    <div class="divider">
-      <span class="divider-text">o</span>
-    </div>
-
     <!-- Botón de Google Login -->
     <button class="google-login-button" (click)="loginWithGoogle()" [disabled]="isLoading()">
       @if (!isLoading()) {
