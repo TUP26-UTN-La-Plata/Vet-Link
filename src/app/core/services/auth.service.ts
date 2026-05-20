@@ -38,15 +38,11 @@ export class AuthService {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(this.#auth, provider);
-    } 
-    finally {}
+    } finally {
+    }
   }
 
-  logout(): void {
-    signOut(this.#auth).catch((error) => {
-      console.error('Error durante el logout:', error);
-    });
-  }
+  logout = (): Promise<void> => signOut(this.#auth);
 
   isLoggedIn(): boolean {
     return this.#firebaseUser() !== null;

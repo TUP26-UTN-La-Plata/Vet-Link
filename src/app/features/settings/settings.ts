@@ -26,9 +26,9 @@ export class Settings {
     this.logoutModalOpen = false;
   }
 
-  protected onLogoutConfirm(): void {
+  protected async onLogoutConfirm(): Promise<void> {
     this.logoutModalOpen = false;
-    this.authService.logout();
-    void this.router.navigate(['/login']);
+    await this.authService.logout();
+    await this.router.navigate(['/login']);
   }
 }
