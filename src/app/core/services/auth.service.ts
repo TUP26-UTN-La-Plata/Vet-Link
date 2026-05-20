@@ -38,7 +38,8 @@ export class AuthService {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(this.#auth, provider);
-    }
+    } 
+    finally {}
   }
 
   logout(): void {
