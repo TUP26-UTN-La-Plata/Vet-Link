@@ -30,10 +30,6 @@ export class Login implements OnInit {
   }
 
   ngOnInit(): void {
-    this.#checkExistingSession();
-  }
-
-  #checkExistingSession(): void {
     if (this.#authService.isLoggedIn()) {
       this.#router.navigate(['/patients']);
     }
