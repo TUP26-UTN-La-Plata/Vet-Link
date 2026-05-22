@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PatientsService } from './patients.service';
+import { PatientsStateService } from '../../core/services';
 import { Patient } from './patients.interface';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
@@ -17,7 +17,6 @@ import { PaginatorModule } from 'primeng/paginator';
 @Component({
   selector: 'app-patients',
   imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule, PaginatorModule],
-  providers: [PatientsService],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
@@ -94,7 +93,7 @@ export class Patients implements OnInit {
   ];
 
   constructor(
-    private patientsService: PatientsService,
+    private patientsStateService: PatientsStateService,
     private cd: ChangeDetectorRef
   ) { }
 
@@ -110,7 +109,7 @@ export class Patients implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    this.patientsService.getPatients().subscribe({
+    this.patientsStateService.getPatients().subscribe({
       next: (data) => {
         this.patients = data;
         this.filteredPatients = [...data];
