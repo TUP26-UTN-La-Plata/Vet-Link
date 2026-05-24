@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PatientsService } from './patients.service';
 import { Patient } from './patients.interface';
@@ -11,56 +11,30 @@ import { InputIconModule } from 'primeng/inputicon'
 import { CascadeSelectModule, CascadeSelectChangeEvent } from 'primeng/cascadeselect';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { delay } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { PaginatorModule } from 'primeng/paginator';
+import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-patients',
-  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule, PaginatorModule],
-  providers: [PatientsService],
+  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule, PaginatorModule, TranslocoModule],
+  providers: [PatientsService, provideTranslocoScope('patients')],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
-export class Patients implements OnInit {
+export class Patients implements OnInit, OnDestroy {
   patients: Patient[] = [];
   filteredPatients: Patient[] = [];
   loading: boolean = false;
   errorMessage: string | null = null;
-  sortOptions: any[] = [
-    {
-      name: 'Nombre',
-      code: 'name',
-      states: [
-        { label: 'A-Z', category: 'Nombre', icon: 'pi pi-sort-alpha-down', value: { prop: 'name', order: 'asc' } },
-        { label: 'Z-A', category: 'Nombre', icon: 'pi pi-sort-alpha-up', value: { prop: 'name', order: 'desc' } }
-      ]
-    },
-    {
-      name: 'Origen',
-      code: 'origin',
-      states: [
-        { label: 'A-Z', category: 'Origen', icon: 'pi pi-sort-alpha-down', value: { prop: 'origin', order: 'asc' } },
-        { label: 'Z-A', category: 'Origen', icon: 'pi pi-sort-alpha-up', value: { prop: 'origin', order: 'desc' } }
-      ]
-    },
-    {
-      name: 'Peso',
-      code: 'weight',
-      states: [
-        { label: 'Menor a Mayor', category: 'Peso', icon: 'pi pi-sort-numeric-down', value: { prop: 'averageWeight', order: 'asc' } },
-        { label: 'Mayor a Menor', category: 'Peso', icon: 'pi pi-sort-numeric-up', value: { prop: 'averageWeight', order: 'desc' } }
-      ]
-    },
-    {
-      name: 'Altura',
-      code: 'height',
-      states: [
-        { label: 'Menor a Mayor', category: 'Altura', icon: 'pi pi-sort-numeric-down', value: { prop: 'averageHeight', order: 'asc' } },
-        { label: 'Mayor a Menor', category: 'Altura', icon: 'pi pi-sort-numeric-up', value: { prop: 'averageHeight', order: 'desc' } }
-      ]
-    }
-  ];
+  sortPlaceholder: string = '';
+  sortOptions: any[] = [];
   selectedSort: any = null;
+
+  #langSubscription!: Subscription;
+  #cd: ChangeDetectorRef;
+  #translocoService: TranslocoService;
+  #patientsService: PatientsService;
 
   first: number = 0;
   rows: number = 12;
@@ -68,7 +42,6 @@ export class Patients implements OnInit {
     root: {
       class: '!bg-white/80 !backdrop-blur-md !border !border-neutral/20 !shadow-xl !rounded-full !px-6 !py-1 !flex !items-center !justify-center'
     },
-    // Nota: Usamos encadenamiento opcional context?.active
     page: ({ context }: any) => ({
       class: [
         '!rounded-full !min-w-[40px] !h-[40px] !flex !items-center !justify-center !transition-all',
@@ -77,7 +50,6 @@ export class Patients implements OnInit {
           : '!text-neutral/70 hover:!bg-neutral/10'
       ].join(' ')
     }),
-    // Simplificamos los botones de acción
     nextbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
     prevbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
     firstbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
@@ -94,13 +66,76 @@ export class Patients implements OnInit {
   ];
 
   constructor(
-    private patientsService: PatientsService,
-    private cd: ChangeDetectorRef
-  ) { }
+    patientsService: PatientsService,
+    cd: ChangeDetectorRef,
+    translocoService: TranslocoService
+  ) {
+    this.#patientsService = patientsService;
+    this.#cd = cd;
+    this.#translocoService = translocoService;
+  }
 
   ngOnInit(): void {
     this.loadData()
+    this.#langSubscription = this.#translocoService.selectTranslation('patients').subscribe(translations => {
+      if (translations) {
+        this.#initializeSortOptions(translations);
+      }
+    });
   };
+
+  #translate(key: string): string {
+    return this.#translocoService.translate(key);
+  }
+
+  #initializeSortOptions(translations: any): void {
+
+    /*console.log(translations);
+    if (!translations || !translations['sort.name']) {
+      console.log(translations);
+      console.error('No se encontraron traducciones para pacientes');
+      return;
+    }*/
+
+    this.sortPlaceholder = translations.placeholderSort;
+
+    this.sortOptions = [
+      {
+        name: translations['sort.name'],
+        code: 'name',
+        states: [
+          { label: translations['sort.ascendant'], category: translations['sort.name'], icon: 'pi pi-sort-alpha-down', value: { prop: 'name', order: 'asc' } },
+          { label: translations['sort.descendant'], category: translations['sort.name'], icon: 'pi pi-sort-alpha-up', value: { prop: 'name', order: 'desc' } }
+        ]
+      },
+      {
+        name: translations['sort.origin'],
+        code: 'origin',
+        states: [
+          { label: translations['sort.ascendant'], category: translations['sort.origin'], icon: 'pi pi-sort-alpha-down', value: { prop: 'origin', order: 'asc' } },
+          { label: translations['sort.descendant'], category: translations['sort.origin'], icon: 'pi pi-sort-alpha-up', value: { prop: 'origin', order: 'desc' } }
+        ]
+      },
+      {
+        name: translations['sort.averageWeight'],
+        code: 'averageWeight',
+        states: [
+          { label: translations['sort.lessToMore'], category: translations['sort.averageWeight'], icon: 'pi pi-sort-numeric-down', value: { prop: 'averageWeight', order: 'asc' } },
+          { label: translations['sort.moreToLess'], category: translations['sort.averageWeight'], icon: 'pi pi-sort-numeric-up', value: { prop: 'averageWeight', order: 'desc' } }
+        ]
+      },
+      {
+        name: translations['sort.averageHeight'],
+        code: 'averageHeight',
+        states: [
+          { label: translations['sort.lessToMore'], category: translations['sort.averageHeight'], icon: 'pi pi-sort-numeric-down', value: { prop: 'averageHeight', order: 'asc' } },
+          { label: translations['sort.moreToLess'], category: translations['sort.averageHeight'], icon: 'pi pi-sort-numeric-up', value: { prop: 'averageHeight', order: 'desc' } }
+        ]
+      }
+    ];
+
+    this.#cd.detectChanges();
+  }
 
   get paginatedPatients() {
     return this.filteredPatients.slice(this.first, this.first + this.rows);
@@ -110,12 +145,12 @@ export class Patients implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    this.patientsService.getPatients().subscribe({
+    this.#patientsService.getPatients().subscribe({
       next: (data) => {
         this.patients = data;
         this.filteredPatients = [...data];
         this.loading = false;
-        this.cd.detectChanges();
+        this.#cd.detectChanges();
       },
       error: (error) => {
         console.error('Error capturado:', error);
@@ -124,8 +159,8 @@ export class Patients implements OnInit {
 
         this.loading = false;
 
-        this.cd.markForCheck();
-        this.cd.detectChanges();
+        this.#cd.markForCheck();
+        this.#cd.detectChanges();
       }
     });
   }
@@ -156,7 +191,7 @@ export class Patients implements OnInit {
     if (!selection || !selection.value) {
       this.selectedSort = null;
       this.filteredPatients = [...this.patients];
-      this.cd.detectChanges();
+      this.#cd.detectChanges();
       return;
     }
 
@@ -177,7 +212,13 @@ export class Patients implements OnInit {
       return order === 'asc' ? result : -result;
     });
 
-    this.cd.markForCheck();
-    this.cd.detectChanges();
+    this.#cd.markForCheck();
+    this.#cd.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    if (this.#langSubscription) {
+      this.#langSubscription.unsubscribe();
+    }
   }
 }

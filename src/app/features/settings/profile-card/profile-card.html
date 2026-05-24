@@ -1,28 +1,27 @@
-<div class="flex h-full min-h-0 w-full flex-col rounded-xl bg-card shadow-md">
-  <div class="flex w-full flex-row justify-between gap-4 border-b-2 border-neutral/20 p-4 pb-4">
-    <div class="flex justify-center items-center w-32">
-      <img src="/avatar.webp" alt="Avatar" class="h-16 w-16 rounded-full">
-    </div>
-    <div class="flex flex-col justify-center items-start w-full">
-      <h4>Dr. Alejandro Méndez</h4>
-      <div class="flex flex-row justify-start items-center gap-2">
-        <i class="pi pi-pencil" ></i>
-        <p>Veterinario</p>
+<ng-container *transloco="let g">
+  <ng-container *transloco="let t; prefix: 'settings.profile-card'">
+    <div class="flex h-full min-h-0 w-full flex-col rounded-xl bg-card shadow-md">
+      <div class="flex w-full flex-row justify-between gap-4 border-b-2 border-neutral/20 p-4 pb-4">
+        <div class="flex justify-center items-center w-32">
+          <img src="/avatar.webp" alt="{{g('common.altAvatar')}}" class="h-16 w-16 rounded-full">
+        </div>
+        <div class="flex flex-col justify-center items-start w-full">
+          <h4>Dr. Alejandro Méndez</h4>
+          <div class="flex flex-row justify-start items-center gap-2">
+            <i class="pi pi-pencil"></i>
+            <p>Veterinario</p>
+          </div>
+        </div>
+        <div class="flex justify-center items-start w-72">
+          <app-action-button label="{{ t('editButton') }}" icon="pi pi-pencil" variant="gray"
+            (clicked)="onEditProfile()" class="w-full pointer-fine:" />
+        </div>
+      </div>
+      <div class="flex flex-1 flex-col items-start justify-evenly p-4 min-h-0">
+        <p class="text-sm text-muted">Clinica Veterinaria "El Socorro"</p>
+        <p class="text-sm text-muted">San Miguel de Tucuman, Tucuman, Argentina</p>
+        <p class="text-sm text-muted">11-1111-1111</p>
       </div>
     </div>
-    <div class="flex justify-center items-start w-72">
-      <app-action-button
-        label="Editar perfil"
-        icon="pi pi-pencil"
-        variant="gray"
-        (clicked)="onEditProfile()"
-        class="w-full pointer-fine:"
-      />
-    </div>
-  </div>
-  <div class="flex flex-1 flex-col items-start justify-evenly p-4 min-h-0">
-    <p class="text-sm text-muted">Clinica Veterinaria "El Socorro"</p>
-    <p class="text-sm text-muted">San Miguel de Tucuman, Tucuman, Argentina</p>
-    <p class="text-sm text-muted">11-1111-1111</p>
-  </div>
-</div>
+  </ng-container>
+</ng-container>

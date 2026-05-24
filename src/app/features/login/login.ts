@@ -2,10 +2,12 @@ import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoModule],
+  providers: [provideTranslocoScope('login')],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -15,9 +17,9 @@ export class Login implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService
-  ) {}
+  ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   handleLogin(): void {
     if (this.isLoading()) return; // Evita múltiples clics

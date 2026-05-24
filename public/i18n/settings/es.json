@@ -1,0 +1,26 @@
+{
+    "title": "Configuración del Sistema",
+    "description": "Gestiná tu cuenta profesional y revisá los datos técnicos del sistema.",
+    "settings-card": {
+        "buttonLogout": "Cerrar sesión"
+    },
+    "logout": {
+        "title": "¿Cerrar sesión?",
+        "message": "Estás a punto de salir de tu cuenta en Vet-Link. Deberás volver a ingresar tus credenciales para acceder a los datos de monitoreo de los pacientes.",
+        "cancel": "Cancelar",
+        "confirm": "Sí, cerrar sesión"
+    },
+    "user-agent-card": {
+        "version": "Versión",
+        "server": "Servidor",
+        "online": "En línea",
+        "offline": "Desconectado",
+        "title": "Entorno del navegador",
+        "browser": "Navegador",
+        "os": "Sistema operativo",
+        "device": "Dispositivo"
+    },
+    "profile-card": {
+        "editButton": "Editar perfil"
+    }
+}

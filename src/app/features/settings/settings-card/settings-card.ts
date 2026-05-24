@@ -1,9 +1,10 @@
 import { Component, output } from '@angular/core';
 import { ActionButton } from '../../../shared/ui/action-button/action-button';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-settings-card',
-  imports: [ActionButton],
+  imports: [ActionButton, TranslocoModule],
   templateUrl: './settings-card.html',
   styleUrl: './settings-card.css',
 })

@@ -1,34 +1,32 @@
-<div class="login-container">
-  <div class="login-card">
-    <!-- Logo/Icono de la aplicación -->
-    <div class="logo-section">
-      <img src="logo_vetlink.png" alt="Logo Vet-Link" class="logo-image">
-      <p class="logo-subtitle">Sistema de Gestión Veterinaria</p>
+<ng-container *transloco="let g">
+  <ng-container *transloco="let t; prefix: 'login'">
+    <div class="login-container">
+      <div class="login-card">
+        <!-- Logo/Icono de la aplicación -->
+        <div class="logo-section">
+          <img src="logo_vetlink.png" alt="{{g('common.altLogo')}}" class="logo-image">
+          <p class="logo-subtitle">{{t('title')}}</p>
+        </div>
+
+        <!-- Botón de inicio de sesión -->
+        <button class="login-button" (click)="handleLogin()" [disabled]="isLoading()" [class.loading]="isLoading()">
+          <!-- Contenido normal -->
+          <span *ngIf="!isLoading()" class="button-text">
+            {{t('buttonLogin')}}
+          </span>
+
+          <!-- Spinner de carga -->
+          <span *ngIf="isLoading()" class="spinner-container">
+            <span class="spinner"></span>
+            <span class="loading-text">{{t('loadingText')}}</span>
+          </span>
+        </button>
+
+        <!-- Pie de página -->
+        <p class="login-footer">
+          {{t('description')}}
+        </p>
+      </div>
     </div>
-
-    <!-- Botón de inicio de sesión -->
-    <button
-      class="login-button"
-      (click)="handleLogin()"
-      [disabled]="isLoading()"
-      [class.loading]="isLoading()"
-    >
-      <!-- Contenido normal -->
-      <span *ngIf="!isLoading()" class="button-text">
-        Iniciar sesión
-      </span>
-
-      <!-- Spinner de carga -->
-      <span *ngIf="isLoading()" class="spinner-container">
-        <span class="spinner"></span>
-        <span class="loading-text">Verificando...</span>
-      </span>
-    </button>
-
-    <!-- Pie de página -->
-    <p class="login-footer">
-      Bienvenido a Vet-Link
-    </p>
-  </div>
-</div>
-
+  </ng-container>
+</ng-container>
