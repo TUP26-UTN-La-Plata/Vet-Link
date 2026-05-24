@@ -5,7 +5,7 @@ import { GuestGuard } from './core/guards/guest.guard';
 export const routes: Routes = [
   {
     path: 'login',
-    title: 'Vet-Link - Inicio de Sesión',
+    title: 'pageTitle.login',
     canActivate: [GuestGuard],
     loadComponent: () => import('./features/login/login').then((m) => m.Login),
   },
@@ -16,13 +16,13 @@ export const routes: Routes = [
     children: [
       {
         path: 'patients',
-        title: 'Vet-Link - Gestión de Pacientes',
-        loadComponent: () => import('./features/patients/patients').then((m) => m.Patients),
+        title: 'pageTitle.patients',
+        loadComponent: () => import('./features/patients/patients').then(m => m.Patients)
       },
       {
         path: 'settings',
-        title: 'Vet-Link - Configuración',
-        loadComponent: () => import('./features/settings/settings').then((m) => m.Settings),
+        title: 'pageTitle.settings',
+        loadComponent: () => import('./features/settings/settings').then(m => m.Settings)
       },
       { path: '', redirectTo: 'patients', pathMatch: 'full' },
     ],

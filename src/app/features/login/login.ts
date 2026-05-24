@@ -2,10 +2,12 @@ import { Component, OnInit, signal, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
+import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoModule],
+  providers: [provideTranslocoScope('login')],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
