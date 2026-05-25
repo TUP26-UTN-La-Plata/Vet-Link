@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, effect, inject } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
@@ -9,43 +9,38 @@ import { AuthService } from '@core/services/auth.service';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login implements OnInit {
+export class Login {
   isLoading = signal(false);
   loginError = signal<string | null>(null);
-  #hasAttemptedLogin = signal(false);
 
   #router = inject(Router);
   #authService = inject(AuthService);
 
   constructor() {
     effect(() => {
-      const isAuthenticated = this.#authService.isLoggedIn();
-      const hasAttempted = this.#hasAttemptedLogin();
-
-      if (isAuthenticated && hasAttempted) {
+      // Redirige automáticamente si el estado de autenticación ya está inicializado
+      // y el usuario ya está logueado. Esto evita usar un flag adicional
+      // para controlar intentos de login.
+      if (
+        this.#authService.isAuthInitialized() &&
+        this.#authService.isLoggedIn()
+      ) {
         this.#router.navigate(['/patients']);
-        this.#hasAttemptedLogin.set(false);
       }
     });
   }
 
-  ngOnInit(): void {
-    if (this.#authService.isLoggedIn()) {
-      this.#router.navigate(['/patients']);
+  async loginWithGoogle(): Promise<void> {
+    if (this.isLoading()) {
+      return;
     }
-  }
-
-  async handleLogin(): Promise<void> {
-    if (this.isLoading()) return;
 
     this.isLoading.set(true);
     this.loginError.set(null);
 
     try {
-      this.#hasAttemptedLogin.set(true);
       await this.#authService.loginWithGoogle();
     } catch (error: any) {
-      this.#hasAttemptedLogin.set(false);
       this.loginError.set(
         error?.message || 'Error al iniciar sesión con Google'
       );
@@ -53,10 +48,6 @@ export class Login implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  async loginWithGoogle(): Promise<void> {
-    await this.handleLogin();
   }
 }
 

@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -22,7 +22,23 @@ export interface UserData {
 export class AuthService {
   #auth = getAuth(initializeApp(firebaseConfig));
   #firebaseUser = signal<User | null>(null);
+  #isAuthInitialized = signal(false);
+
   readonly authState = this.#firebaseUser.asReadonly();
+  readonly isAuthInitialized = this.#isAuthInitialized.asReadonly();
+  readonly isLoggedIn = computed(() => this.#firebaseUser() !== null);
+  readonly userData = computed<UserData | null>(() => {
+    const user = this.#firebaseUser();
+    if (!user) {
+      return null;
+    }
+
+    return {
+      name: user.displayName ?? '',
+      email: user.email ?? '',
+      photoURL: user.photoURL || '/avatar.webp',
+    };
+  });
 
   constructor() {
     this.#initializeFirebase();
@@ -31,21 +47,19 @@ export class AuthService {
   #initializeFirebase(): void {
     onAuthStateChanged(this.#auth, (firebaseUser) => {
       this.#firebaseUser.set(firebaseUser);
+      this.#isAuthInitialized.set(true);
     });
   }
 
   async loginWithGoogle(): Promise<void> {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(this.#auth, provider);
-    } finally {
-    }
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(this.#auth, provider);
   }
 
   logout = (): Promise<void> => signOut(this.#auth);
 
-  isLoggedIn(): boolean {
-    return this.#firebaseUser() !== null;
+  isLoggedInSnapshot(): boolean {
+    return this.isLoggedIn();
   }
 
   getUserName(): string | null {
@@ -61,7 +75,7 @@ export class AuthService {
     return {
       name: user.displayName ?? '',
       email: user.email ?? '',
-      photoURL: user.photoURL ?? '',
+      photoURL: user.photoURL || '/avatar.webp',
     };
   }
 }

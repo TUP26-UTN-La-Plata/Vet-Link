@@ -1,15 +1,15 @@
 <div class="flex h-full min-h-0 w-full flex-col rounded-xl bg-card shadow-md">
   <div class="flex w-full flex-row justify-between gap-4 border-b-2 border-neutral/20 p-4 pb-4">
     <div class="flex justify-center items-center w-32">
-      <img [src]="authService.getUserData()?.photoURL || '/avatar.webp'" alt="Avatar" class="h-16 w-16 rounded-full" (error)="$event.target.src = '/avatar.webp'">
+      <img [src]="authService.userData()?.photoURL || '/avatar.webp'" alt="Avatar" class="h-16 w-16 rounded-full" (error)="$event.target.src = '/avatar.webp'">
     </div>
     <div class="flex flex-col justify-center items-start w-full">
       <h4>
-        {{ authService.getUserData()?.name || authService.getUserData()?.email || 'Usuario' }}
+        {{ authService.userData()?.name || authService.userData()?.email || 'Usuario' }}
       </h4>
-      @if (authService.getUserData()?.email) {
+      @if (authService.userData()?.email) {
       <p class="text-sm text-muted">
-        {{ authService.getUserData()?.email }}
+        {{ authService.userData()?.email }}
       </p>
       } @else {
       <p class="text-sm text-muted">
