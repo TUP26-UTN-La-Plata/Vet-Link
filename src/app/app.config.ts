@@ -16,7 +16,6 @@ export const appConfig: ApplicationConfig = {
     providePrimeNG({
       theme: {
         preset: Aura, // O prueba Lara, Nora, etc.
-        preset: Aura, // O prueba Lara, Nora, etc.
         options: {
           prefix: 'p', // Prefijo por defecto
           darkModeSelector: '.dark', // Soporte dark mode
