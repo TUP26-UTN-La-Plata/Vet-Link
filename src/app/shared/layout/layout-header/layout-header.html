@@ -1,13 +1,17 @@
 <header
-    class="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-3 border-b-2 border-neutral/20 bg-card px-4">
-    <div class="shrink-0 md:hidden">
-      <img src="/logo.png" alt="Vet-Link" class="h-10 w-auto max-w-28 object-contain" />
+  class="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-3 border-b-2 border-neutral/20 bg-card px-4">
+  <div class="shrink-0 md:hidden">
+    <img src="/logo.png" alt="Vet-Link" class="h-10 w-auto max-w-28 object-contain" />
+  </div>
+  <div class="min-w-0 flex-1">
+    <div class="flex items-center justify-end gap-8">
+      <i class="pi pi-bell"></i>
+      <i class="pi pi-question-circle"></i>
+      <img
+        [src]="authService.getUserData()?.photoURL || '/avatar.webp'"
+        [alt]="authService.getUserData()?.name || 'Avatar'"
+        class="h-8 w-8 rounded-full object-cover"
+        (error)="$event.target.src = '/avatar.webp'" />
     </div>
-    <div class="min-w-0 flex-1">
-      <div class="flex items-center justify-end gap-8">
-        <i class="pi pi-bell"></i>
-        <i class="pi pi-question-circle"></i>
-        <img src="/avatar.webp" alt="Avatar" class="h-8 w-8 rounded-full" />
-      </div>
-    </div>
-  </header>
+  </div>
+</header>

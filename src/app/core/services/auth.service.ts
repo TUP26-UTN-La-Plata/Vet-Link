@@ -1,68 +1,73 @@
 import { Injectable, signal } from '@angular/core';
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged,
+  User,
+} from 'firebase/auth';
+import { firebaseConfig } from '../config/firebase.config';
 
-export interface SessionData {
-  userId: string;
-  loginTime: string;
-  isAuthenticated: boolean;
+export interface UserData {
+  name: string;
+  email: string;
+  photoURL: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private sessionKey = 'vetlink_session';
-  isAuthenticated = signal(false);
+  #auth = getAuth(initializeApp(firebaseConfig));
+  #firebaseUser = signal<User | null>(null);
+  readonly authState = this.#firebaseUser.asReadonly();
 
   constructor() {
-    this.checkSession();
+    this.#initializeFirebase();
   }
 
-  private checkSession(): void {
-    const session = sessionStorage.getItem(this.sessionKey);
-    if (session) {
-      try {
-        const sessionData = JSON.parse(session);
-        this.isAuthenticated.set(sessionData.isAuthenticated);
-      } catch (e) {
-        this.clearSession();
-      }
+  #initializeFirebase(): void {
+    onAuthStateChanged(this.#auth, (firebaseUser) => {
+      this.#firebaseUser.set(firebaseUser);
+    });
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(this.#auth, provider);
+    } catch (error) {
+      console.error('Error durante el login con Google:', error);
+      throw error;
     }
-  }
-
-  getSession(): SessionData | null {
-    const session = sessionStorage.getItem(this.sessionKey);
-    if (session) {
-      try {
-        return JSON.parse(session);
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  }
-
-  login(userId: string = 'user_' + Date.now()): void {
-    const sessionData: SessionData = {
-      userId,
-      loginTime: new Date().toISOString(),
-      isAuthenticated: true,
-    };
-
-    sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
-    this.isAuthenticated.set(true);
   }
 
   logout(): void {
-    sessionStorage.removeItem(this.sessionKey);
-    this.isAuthenticated.set(false);
+    signOut(this.#auth).catch((error) => {
+      console.error('Error durante el logout:', error);
+    });
   }
 
   isLoggedIn(): boolean {
-    return this.isAuthenticated();
+    return this.#firebaseUser() !== null;
   }
 
-  private clearSession(): void {
-    sessionStorage.removeItem(this.sessionKey);
-    this.isAuthenticated.set(false);
+  getUserName(): string | null {
+    return this.#firebaseUser()?.displayName ?? null;
+  }
+
+  getUserData(): UserData | null {
+    const user = this.#firebaseUser();
+    if (!user) {
+      return null;
+    }
+
+    return {
+      name: user.displayName ?? '',
+      email: user.email ?? '',
+      photoURL: user.photoURL ?? '',
+    };
   }
 }

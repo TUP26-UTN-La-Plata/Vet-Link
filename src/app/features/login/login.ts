@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -11,24 +11,55 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class Login implements OnInit {
   isLoading = signal(false);
+  loginError = signal<string | null>(null);
+  #hasAttemptedLogin = signal(false);
 
-  constructor(
-    private router: Router,
-    private authService: AuthService
-  ) {}
+  #router = inject(Router);
+  #authService = inject(AuthService);
 
-  ngOnInit(): void {}
+  constructor() {
+    effect(() => {
+      const isAuthenticated = this.#authService.isLoggedIn();
+      const hasAttempted = this.#hasAttemptedLogin();
 
-  handleLogin(): void {
-    if (this.isLoading()) return; // Evita múltiples clics
+      if (isAuthenticated && hasAttempted) {
+        this.#router.navigate(['/patients']);
+        this.#hasAttemptedLogin.set(false);
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    this.#checkExistingSession();
+  }
+
+  #checkExistingSession(): void {
+    if (this.#authService.isLoggedIn()) {
+      this.#router.navigate(['/patients']);
+    }
+  }
+
+  async handleLogin(): Promise<void> {
+    if (this.isLoading()) return;
 
     this.isLoading.set(true);
+    this.loginError.set(null);
 
-    setTimeout(() => {
-      this.authService.login();
+    try {
+      this.#hasAttemptedLogin.set(true);
+      await this.#authService.loginWithGoogle();
+    } catch (error: unknown) {
+      this.#hasAttemptedLogin.set(false);
+      this.loginError.set(
+        error instanceof Error ? error.message : 'Error al iniciar sesión con Google'
+      );
+      console.error('Error en login:', error);
+    } finally {
       this.isLoading.set(false);
-      this.router.navigate(['/patients']);
-    }, 2000);
+    }
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    await this.handleLogin();
   }
 }
-

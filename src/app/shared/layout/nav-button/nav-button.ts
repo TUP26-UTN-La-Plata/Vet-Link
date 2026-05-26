@@ -10,9 +10,9 @@ export type NavButtonVariant = 'sidebar' | 'bottom';
   styleUrl: './nav-button.css',
 })
 export class NavButton {
-  @Input({ required: true }) label: string = 'NavButton';
-  @Input({ required: true }) icon: string = 'pi pi-home';
-  @Input({ required: true }) routerLink: string = '/';
+  @Input({ required: true }) label = 'NavButton';
+  @Input({ required: true }) icon = 'pi pi-home';
+  @Input({ required: true }) routerLink = '/';
   /** `bottom`: icon + label stacked for mobile tab bar */
   @Input() variant: NavButtonVariant = 'sidebar';
 }
