@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, delay, map, of, tap } from 'rxjs';
-import { Patient } from './patients.interface';
+import { Observable, map, of, tap } from 'rxjs';
+import { DogApiBreed, Patient } from './patients.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -12,10 +12,9 @@ export class PatientsService {
   readonly #CACHE_LABEL = 'patients_cache';
   readonly #CACHE_LIFETIME = 5 * 60 * 1000;
 
-  #http: HttpClient;
+  readonly #http = inject(HttpClient);
 
-  constructor(http: HttpClient) {
-    this.#http = http;
+  constructor() {
     console.log('Patients Service initialized');
   }
 
@@ -37,8 +36,8 @@ export class PatientsService {
       'x-api-key': this.#API_KEY,
     });
 
-    return this.#http.get<Patient[]>(this.#API_URL, { headers }).pipe(
-      map((apiData: any[]) => {
+    return this.#http.get<DogApiBreed[]>(this.#API_URL, { headers }).pipe(
+      map((apiData: DogApiBreed[]) => {
         return apiData.map((item) => this.#itemToPatient(item));
       }),
       tap((mappedData) => {
@@ -48,14 +47,14 @@ export class PatientsService {
     );
   }
 
-  #itemToPatient(item: any): Patient {
+  #itemToPatient(item: DogApiBreed): Patient {
     const imageUrl =
       item.image?.url ||
       (item.reference_image_id
         ? `https://cdn2.thedogapi.com/images/${item.reference_image_id}.jpg`
         : 'no-image.webp');
     return {
-      id: item.id,
+      id: Number(item.id),
       name: item.name,
       image: imageUrl,
       description: item.description || item.temperament || item.bred_for || 'Sin descripción',
@@ -65,7 +64,7 @@ export class PatientsService {
     };
   }
 
-  #calculateAverage(range: string): number {
+  #calculateAverage(range: string | undefined): number {
     if (!range) return 0;
 
     const numbers = range.match(/\d+(\.\d+)?/g)?.map(Number);

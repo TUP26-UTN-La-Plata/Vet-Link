@@ -1,7 +1,12 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PatientsService } from './patients.service';
-import { Patient } from './patients.interface';
+import {
+  Patient,
+  PatientsPaginatorPt,
+  SortCascadeGroup,
+  SortCascadeState,
+} from './patients.interface';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
@@ -36,9 +41,9 @@ import { PaginatorModule } from 'primeng/paginator';
 export class Patients implements OnInit {
   patients: Patient[] = [];
   filteredPatients: Patient[] = [];
-  loading: boolean = false;
+  loading = false;
   errorMessage: string | null = null;
-  sortOptions: any[] = [
+  sortOptions: SortCascadeGroup[] = [
     {
       name: 'Nombre',
       code: 'name',
@@ -112,17 +117,17 @@ export class Patients implements OnInit {
       ],
     },
   ];
-  selectedSort: any = null;
+  selectedSort: SortCascadeState | null = null;
 
-  first: number = 0;
-  rows: number = 12;
-  paginatorPt: any = {
+  first = 0;
+  rows = 12;
+  paginatorPt: PatientsPaginatorPt = {
     root: {
       class:
         '!bg-white/80 !backdrop-blur-md !border !border-neutral/20 !shadow-xl !rounded-full !px-6 !py-1 !flex !items-center !justify-center',
     },
     // Nota: Usamos encadenamiento opcional context?.active
-    page: ({ context }: any) => ({
+    page: ({ context }) => ({
       class: [
         '!rounded-full !min-w-[40px] !h-[40px] !flex !items-center !justify-center !transition-all',
         context?.active
@@ -146,13 +151,8 @@ export class Patients implements OnInit {
     { icon: 'pi pi-bars', value: 'list' },
   ];
 
-  #patientsService: PatientsService;
-  #cd: ChangeDetectorRef;
-
-  constructor(patientsService: PatientsService, cd: ChangeDetectorRef) {
-    this.#patientsService = patientsService;
-    this.#cd = cd;
-  }
+  #patientsService = inject(PatientsService);
+  #cd = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.loadData();
@@ -205,7 +205,7 @@ export class Patients implements OnInit {
     this.first = 0;
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: { first: number; rows: number }) {
     this.first = event.first;
     this.rows = event.rows;
     window.scrollTo({ top: 0, behavior: 'smooth' });
