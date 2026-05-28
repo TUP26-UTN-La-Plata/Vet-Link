@@ -1,13 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PatientsService } from './patients.service';
-import {
-  Patient,
-  PatientsPaginatorPt,
-  SortCascadeGroup,
-  SortCascadeState,
-} from './patients.interface';
+import { Patient, PatientsPaginatorPt, SortCascadeOption } from './patients.interface';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
@@ -18,36 +12,37 @@ import { CascadeSelectModule, CascadeSelectChangeEvent } from 'primeng/cascadese
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { Subscription } from 'rxjs';
-import { Subscription } from 'rxjs';
-import { PaginatorModule } from 'primeng/paginator';
-import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-patients',
-  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule, PaginatorModule, TranslocoModule],
-  providers: [PatientsService, provideTranslocoScope('patients')],
-  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule, PaginatorModule, TranslocoModule],
+  imports: [
+    FormsModule,
+    ProgressSpinnerModule,
+    MessageModule,
+    CardModule,
+    InputTextModule,
+    IconFieldModule,
+    InputIconModule,
+    CascadeSelectModule,
+    DataViewModule,
+    SelectButtonModule,
+    PaginatorModule,
+    TranslocoModule,
+  ],
   providers: [PatientsService, provideTranslocoScope('patients')],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
 export class Patients implements OnInit, OnDestroy {
-export class Patients implements OnInit, OnDestroy {
   patients: Patient[] = [];
   filteredPatients: Patient[] = [];
   loading = false;
   errorMessage: string | null = null;
-  sortPlaceholder: string = '';
-  sortOptions: any[] = [];
-  sortPlaceholder: string = '';
-  sortOptions: any[] = [];
-  selectedSort: any = null;
-
-  #langSubscription!: Subscription;
-  #cd: ChangeDetectorRef;
-  #translocoService: TranslocoService;
-  #patientsService: PatientsService;
+  sortPlaceholder = '';
+  selectedSort: SortCascadeOption | null = null;
+  sortOptions: SortCascadeOption[] = [];
 
   first = 0;
   rows = 12;
@@ -56,10 +51,10 @@ export class Patients implements OnInit, OnDestroy {
       class:
         '!bg-white/80 !backdrop-blur-md !border !border-neutral/20 !shadow-xl !rounded-full !px-6 !py-1 !flex !items-center !justify-center',
     },
-    page: ({ context }: any) => ({
+    page: (options: { context?: { active?: boolean } }) => ({
       class: [
         '!rounded-full !min-w-[40px] !h-[40px] !flex !items-center !justify-center !transition-all',
-        context?.active
+        options.context?.active
           ? '!bg-neutral !text-white !font-bold'
           : '!text-neutral/70 hover:!bg-neutral/10',
       ].join(' '),
@@ -79,160 +74,117 @@ export class Patients implements OnInit, OnDestroy {
     { icon: 'pi pi-bars', value: 'list' },
   ];
 
-  constructor(
-    patientsService: PatientsService,
-    cd: ChangeDetectorRef,
-    translocoService: TranslocoService
-  ) {
-    this.#patientsService = patientsService;
-    this.#cd = cd;
-    this.#translocoService = translocoService;
+  #patientsService = inject(PatientsService);
+  #cd = inject(ChangeDetectorRef);
+  #translocoService = inject(TranslocoService);
+  #langSubscription!: Subscription;
+
+  ngOnInit(): void {
+    this.loadData();
+    this.#langSubscription = this.#translocoService
+      .selectTranslation('patients')
+      .subscribe((translations) => {
+        if (translations) {
+          this.sortPlaceholder = translations['placeholderSort'] || '';
+          this.#initializeSortOptions(translations);
+        }
+      });
   }
-  patientsService: PatientsService,
-  cd: ChangeDetectorRef,
-  translocoService: TranslocoService
-  ) {
-  this.#patientsService = patientsService;
-  this.#cd = cd;
-  this.#translocoService = translocoService;
-}
 
-ngOnInit(): void {
-  this.loadData()
-    this.#langSubscription = this.#translocoService.selectTranslation('patients').subscribe(translations => {
-    if (translations) {
-      this.#initializeSortOptions(translations);
-    }
-  });
-};
+  #initializeSortOptions(t: Record<string, unknown>): void {
+    const sort = t['sort'] as Record<string, string> | undefined;
 
-#translate(key: string): string {
-  return this.#translocoService.translate(key);
-}
+    this.sortOptions = [
+      {
+        name: sort?.['name'] || 'Nombre',
+        code: 'name',
+        states: [
+          {
+            label: sort?.['ascendant'] || 'Ascendente',
+            category: sort?.['name'] || 'Nombre',
+            icon: 'pi pi-sort-alpha-down',
+            value: { prop: 'name', order: 'asc' },
+          },
+          {
+            label: sort?.['descendant'] || 'Descendente',
+            category: sort?.['name'] || 'Nombre',
+            icon: 'pi pi-sort-alpha-up',
+            value: { prop: 'name', order: 'desc' },
+          },
+        ],
+      },
+      {
+        name: sort?.['origin'] || 'Origen',
+        code: 'origin',
+        states: [
+          {
+            label: sort?.['ascendant'] || 'Ascendente',
+            category: sort?.['origin'] || 'Origen',
+            icon: 'pi pi-sort-alpha-down',
+            value: { prop: 'origin', order: 'asc' },
+          },
+          {
+            label: sort?.['descendant'] || 'Descendente',
+            category: sort?.['origin'] || 'Origen',
+            icon: 'pi pi-sort-alpha-up',
+            value: { prop: 'origin', order: 'desc' },
+          },
+        ],
+      },
+      {
+        name: sort?.['averageWeight'] || 'Peso Promedio',
+        code: 'averageWeight',
+        states: [
+          {
+            label: sort?.['lessToMore'] || 'Menos a Más',
+            category: sort?.['averageWeight'] || 'Peso Promedio',
+            icon: 'pi pi-sort-numeric-down',
+            value: { prop: 'averageWeight', order: 'asc' },
+          },
+          {
+            label: sort?.['moreToLess'] || 'Más a Menos',
+            category: sort?.['averageWeight'] || 'Peso Promedio',
+            icon: 'pi pi-sort-numeric-up',
+            value: { prop: 'averageWeight', order: 'desc' },
+          },
+        ],
+      },
+      {
+        name: sort?.['averageHeight'] || 'Altura Promedio',
+        code: 'averageHeight',
+        states: [
+          {
+            label: sort?.['lessToMore'] || 'Menos a Más',
+            category: sort?.['averageHeight'] || 'Altura Promedio',
+            icon: 'pi pi-sort-numeric-down',
+            value: { prop: 'averageHeight', order: 'asc' },
+          },
+          {
+            label: sort?.['moreToLess'] || 'Más a Menos',
+            category: sort?.['averageHeight'] || 'Altura Promedio',
+            icon: 'pi pi-sort-numeric-up',
+            value: { prop: 'averageHeight', order: 'desc' },
+          },
+        ],
+      },
+    ];
 
-#initializeSortOptions(translations: any): void {
-
-  /*console.log(translations);
-  if (!translations || !translations['sort.name']) {
-    console.log(translations);
-    console.error('No se encontraron traducciones para pacientes');
-    return;
-  }*/
-
-  this.sortPlaceholder = translations.placeholderSort;
-
-  this.sortOptions = [
-    {
-      name: translations['sort.name'],
-      code: 'name',
-      states: [
-        { label: translations['sort.ascendant'], category: translations['sort.name'], icon: 'pi pi-sort-alpha-down', value: { prop: 'name', order: 'asc' } },
-        { label: translations['sort.descendant'], category: translations['sort.name'], icon: 'pi pi-sort-alpha-up', value: { prop: 'name', order: 'desc' } }
-      ]
-    },
-    {
-      name: translations['sort.origin'],
-      code: 'origin',
-      states: [
-        { label: translations['sort.ascendant'], category: translations['sort.origin'], icon: 'pi pi-sort-alpha-down', value: { prop: 'origin', order: 'asc' } },
-        { label: translations['sort.descendant'], category: translations['sort.origin'], icon: 'pi pi-sort-alpha-up', value: { prop: 'origin', order: 'desc' } }
-      ]
-    },
-    {
-      name: translations['sort.averageWeight'],
-      code: 'averageWeight',
-      states: [
-        { label: translations['sort.lessToMore'], category: translations['sort.averageWeight'], icon: 'pi pi-sort-numeric-down', value: { prop: 'averageWeight', order: 'asc' } },
-        { label: translations['sort.moreToLess'], category: translations['sort.averageWeight'], icon: 'pi pi-sort-numeric-up', value: { prop: 'averageWeight', order: 'desc' } }
-      ]
-    },
-    {
-      name: translations['sort.averageHeight'],
-      code: 'averageHeight',
-      states: [
-        { label: translations['sort.lessToMore'], category: translations['sort.averageHeight'], icon: 'pi pi-sort-numeric-down', value: { prop: 'averageHeight', order: 'asc' } },
-        { label: translations['sort.moreToLess'], category: translations['sort.averageHeight'], icon: 'pi pi-sort-numeric-up', value: { prop: 'averageHeight', order: 'desc' } }
-      ]
-    }
-  ];
-
-  this.#cd.detectChanges();
-}
-this.#langSubscription = this.#translocoService.selectTranslation('patients').subscribe(translations => {
-  if (translations) {
-    this.#initializeSortOptions(translations);
+    this.#cd.detectChanges();
   }
-});
-  };
-
-#translate(key: string): string {
-  return this.#translocoService.translate(key);
-}
-
-#initializeSortOptions(translations: any): void {
-
-  /*console.log(translations);
-  if (!translations || !translations['sort.name']) {
-    console.log(translations);
-    console.error('No se encontraron traducciones para pacientes');
-    return;
-  }*/
-
-  this.sortPlaceholder = translations.placeholderSort;
-
-  this.sortOptions = [
-    {
-      name: translations['sort.name'],
-      code: 'name',
-      states: [
-        { label: translations['sort.ascendant'], category: translations['sort.name'], icon: 'pi pi-sort-alpha-down', value: { prop: 'name', order: 'asc' } },
-        { label: translations['sort.descendant'], category: translations['sort.name'], icon: 'pi pi-sort-alpha-up', value: { prop: 'name', order: 'desc' } }
-      ]
-    },
-    {
-      name: translations['sort.origin'],
-      code: 'origin',
-      states: [
-        { label: translations['sort.ascendant'], category: translations['sort.origin'], icon: 'pi pi-sort-alpha-down', value: { prop: 'origin', order: 'asc' } },
-        { label: translations['sort.descendant'], category: translations['sort.origin'], icon: 'pi pi-sort-alpha-up', value: { prop: 'origin', order: 'desc' } }
-      ]
-    },
-    {
-      name: translations['sort.averageWeight'],
-      code: 'averageWeight',
-      states: [
-        { label: translations['sort.lessToMore'], category: translations['sort.averageWeight'], icon: 'pi pi-sort-numeric-down', value: { prop: 'averageWeight', order: 'asc' } },
-        { label: translations['sort.moreToLess'], category: translations['sort.averageWeight'], icon: 'pi pi-sort-numeric-up', value: { prop: 'averageWeight', order: 'desc' } }
-      ]
-    },
-    {
-      name: translations['sort.averageHeight'],
-      code: 'averageHeight',
-      states: [
-        { label: translations['sort.lessToMore'], category: translations['sort.averageHeight'], icon: 'pi pi-sort-numeric-down', value: { prop: 'averageHeight', order: 'asc' } },
-        { label: translations['sort.moreToLess'], category: translations['sort.averageHeight'], icon: 'pi pi-sort-numeric-up', value: { prop: 'averageHeight', order: 'desc' } }
-      ]
-    }
-  ];
-
-  this.#cd.detectChanges();
-}
 
   get paginatedPatients() {
-  return this.filteredPatients.slice(this.first, this.first + this.rows);
-}
+    return this.filteredPatients.slice(this.first, this.first + this.rows);
+  }
 
-loadData() {
-  this.loading = true;
-  this.errorMessage = null;
+  loadData() {
+    this.loading = true;
+    this.errorMessage = null;
 
-  this.#patientsService.getPatients().subscribe({
     this.#patientsService.getPatients().subscribe({
       next: (data) => {
         this.patients = data;
         this.filteredPatients = [...data];
         this.loading = false;
-        this.#cd.detectChanges();
         this.#cd.detectChanges();
       },
       error: (error) => {
@@ -245,9 +197,7 @@ loadData() {
 
         this.#cd.markForCheck();
         this.#cd.detectChanges();
-        this.#cd.markForCheck();
-        this.#cd.detectChanges();
-      }
+      },
     });
   }
 
@@ -266,55 +216,46 @@ loadData() {
     this.first = 0;
   }
 
-  onPageChange(event: { first: number; rows: number }) {
-    this.first = event.first;
-    this.rows = event.rows;
+  onPageChange(event: PaginatorState) {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? 12;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   sortPatients(event: CascadeSelectChangeEvent) {
-    const selection = event.value;
+    const selection = event.value as SortCascadeOption | null;
 
-    if(!selection || !selection.value) {
-    this.selectedSort = null;
-    this.filteredPatients = [...this.patients];
-    this.#cd.detectChanges();
-    this.#cd.detectChanges();
-    return;
-  }
-
-  const { prop, order } = selection.value;
-
-  this.filteredPatients = [...this.filteredPatients].sort((a, b) => {
-    const valueA = a[prop as keyof Patient];
-    const valueB = b[prop as keyof Patient];
-
-    let result = 0;
-
-    if (typeof valueA === 'string' && typeof valueB === 'string') {
-      result = valueA.localeCompare(valueB);
-    } else if (typeof valueA === 'number' && typeof valueB === 'number') {
-      result = valueA - valueB;
+    if (!selection || !selection.value) {
+      this.selectedSort = null;
+      this.filteredPatients = [...this.patients];
+      this.#cd.detectChanges();
+      return;
     }
 
-    return order === 'asc' ? result : -result;
-  });
+    const { prop, order } = selection.value;
 
-  this.#cd.markForCheck();
-  this.#cd.detectChanges();
-}
+    this.filteredPatients = [...this.filteredPatients].sort((a, b) => {
+      const valueA = a[prop as keyof Patient];
+      const valueB = b[prop as keyof Patient];
 
-ngOnDestroy(): void {
-  if(this.#langSubscription) {
-  this.#langSubscription.unsubscribe();
-}
-this.#cd.markForCheck();
-this.#cd.detectChanges();
+      let result = 0;
+
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        result = valueA.localeCompare(valueB);
+      } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+        result = valueA - valueB;
+      }
+
+      return order === 'asc' ? result : -result;
+    });
+
+    this.#cd.markForCheck();
+    this.#cd.detectChanges();
   }
 
-ngOnDestroy(): void {
-  if(this.#langSubscription) {
-  this.#langSubscription.unsubscribe();
-}
+  ngOnDestroy(): void {
+    if (this.#langSubscription) {
+      this.#langSubscription.unsubscribe();
+    }
   }
 }

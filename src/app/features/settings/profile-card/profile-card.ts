@@ -6,7 +6,6 @@ import { TranslocoModule } from '@jsverse/transloco';
 @Component({
   selector: 'app-profile-card',
   imports: [ActionButton, TranslocoModule],
-  imports: [ActionButton, TranslocoModule],
   templateUrl: './profile-card.html',
   styleUrl: './profile-card.css',
 })

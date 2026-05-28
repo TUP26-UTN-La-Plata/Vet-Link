@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { PrimeNG } from 'primeng/config';
 import { TranslocoService } from '@jsverse/transloco';
@@ -10,16 +10,13 @@ import { TranslocoService } from '@jsverse/transloco';
   styleUrl: './app.css',
 })
 export class App implements OnInit {
-
-  constructor(
-    private primeng: PrimeNG,
-    private translocoService: TranslocoService
-  ) { }
+  #primeng = inject(PrimeNG);
+  #translocoService = inject(TranslocoService);
 
   ngOnInit(): void {
-    this.translocoService.selectTranslation().subscribe(translations => {
+    this.#translocoService.selectTranslation().subscribe((translations) => {
       if (translations && translations['primeng']) {
-        this.primeng.setTranslation(translations['primeng']);
+        this.#primeng.setTranslation(translations['primeng']);
       }
     });
   }
