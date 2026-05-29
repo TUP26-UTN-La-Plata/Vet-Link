@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { TranslocoModule } from '@jsverse/transloco';
 
 export type NavButtonVariant = 'sidebar' | 'bottom';
 
 @Component({
   selector: 'app-nav-button',
-  imports: [RouterModule],
+  imports: [RouterModule, TranslocoModule],
   templateUrl: './nav-button.html',
   styleUrl: './nav-button.css',
 })

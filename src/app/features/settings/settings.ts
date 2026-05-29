@@ -5,10 +5,12 @@ import { ConfirmModal } from '@shared/components/confirm-modal/confirm-modal';
 import { UserAgentCard } from './user-agent-card/user-agent-card';
 import { ProfileCard } from './profile-card/profile-card';
 import { SettingsCard } from './settings-card/settings-card';
+import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-settings',
-  imports: [UserAgentCard, ProfileCard, SettingsCard, ConfirmModal],
+  imports: [UserAgentCard, ProfileCard, SettingsCard, ConfirmModal, TranslocoModule],
+  providers: [provideTranslocoScope('settings')],
   templateUrl: './settings.html',
   styleUrl: './settings.css',
 })

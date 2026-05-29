@@ -48,16 +48,19 @@ interface SortCascadeValue {
   prop: keyof Patient;
   order: 'asc' | 'desc';
 }
-export interface SortCascadeState {
-  label: string;
-  category: string;
-  icon: string;
-  value: SortCascadeValue;
+interface SortCascadeValue {
+  prop: keyof Patient;
+  order: 'asc' | 'desc';
 }
-export interface SortCascadeGroup {
-  name: string;
-  code: string;
-  states: SortCascadeState[];
+
+export interface SortCascadeOption {
+  name?: string;
+  label?: string;
+  category?: string;
+  icon?: string;
+  code?: string;
+  value?: SortCascadeValue;
+  states?: SortCascadeOption[];
 }
 
 export interface PaginatorPageContext {
