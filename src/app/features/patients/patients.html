@@ -23,7 +23,7 @@
         <div class="w-full md:w-64">
           <p-cascadeSelect
             [(ngModel)]="selectedSort"
-            [options]="sortOptions"
+            [options]="$any(sortOptions)"
             [optionGroupChildren]="['states']"
             optionLabel="label"
             optionGroupLabel="name"

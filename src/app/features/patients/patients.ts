@@ -1,17 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-<<<<<<< HEAD
-import { PatientsService } from './patients.service';
 import {
   Patient,
   PatientsPaginatorPt,
   SortCascadeGroup,
   SortCascadeState,
 } from './patients.interface';
-=======
-import { PatientsStateService } from '../../core/services';
-import { Patient } from './patients.interface';
->>>>>>> e818cc1 (implemented state handler)
+import { PatientsService } from './patients.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
@@ -21,12 +16,10 @@ import { InputIconModule } from 'primeng/inputicon';
 import { CascadeSelectModule, CascadeSelectChangeEvent } from 'primeng/cascadeselect';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { delay } from 'rxjs';
-import { PaginatorModule } from 'primeng/paginator';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 
 @Component({
   selector: 'app-patients',
-<<<<<<< HEAD
   imports: [
     FormsModule,
     ProgressSpinnerModule,
@@ -40,10 +33,6 @@ import { PaginatorModule } from 'primeng/paginator';
     SelectButtonModule,
     PaginatorModule,
   ],
-  providers: [PatientsService],
-=======
-  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule, PaginatorModule],
->>>>>>> e818cc1 (implemented state handler)
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
@@ -136,7 +125,7 @@ export class Patients implements OnInit {
         '!bg-white/80 !backdrop-blur-md !border !border-neutral/20 !shadow-xl !rounded-full !px-6 !py-1 !flex !items-center !justify-center',
     },
     // Nota: Usamos encadenamiento opcional context?.active
-    page: ({ context }) => ({
+    page: ({ context }: { context?: { active?: boolean } }) => ({
       class: [
         '!rounded-full !min-w-[40px] !h-[40px] !flex !items-center !justify-center !transition-all',
         context?.active
@@ -160,15 +149,8 @@ export class Patients implements OnInit {
     { icon: 'pi pi-bars', value: 'list' },
   ];
 
-<<<<<<< HEAD
-  #patientsService = inject(PatientsService);
-  #cd = inject(ChangeDetectorRef);
-=======
-  constructor(
-    private patientsStateService: PatientsStateService,
-    private cd: ChangeDetectorRef
-  ) { }
->>>>>>> e818cc1 (implemented state handler)
+  readonly #patientsService = inject(PatientsService);
+  readonly #cd = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.loadData();
@@ -182,40 +164,25 @@ export class Patients implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-<<<<<<< HEAD
-    this.#patientsService
-      .getPatients()
-      .pipe(delay(2000))
-      .subscribe({
-        next: (data) => {
-          this.patients = data;
-          this.filteredPatients = [...data];
-          this.loading = false;
-          this.#cd.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error capturado:', error);
-=======
-    this.patientsStateService.getPatients().subscribe({
+    this.#patientsService.getPatients().subscribe({
       next: (data) => {
         this.patients = data;
         this.filteredPatients = [...data];
         this.loading = false;
-        this.cd.detectChanges();
+        this.#cd.detectChanges();
       },
       error: (error) => {
         console.error('Error capturado:', error);
->>>>>>> e818cc1 (implemented state handler)
 
-          this.errorMessage =
-            'Lo sentimos, no pudimos sincronizar los datos con Vet-Link. Por favor, intenta de nuevo más tarde.';
+        this.errorMessage =
+          'Lo sentimos, no pudimos sincronizar los datos con Vet-Link. Por favor, intenta de nuevo más tarde.';
 
-          this.loading = false;
+        this.loading = false;
 
-          this.#cd.markForCheck();
-          this.#cd.detectChanges();
-        },
-      });
+        this.#cd.markForCheck();
+        this.#cd.detectChanges();
+      },
+    });
   }
 
   filterPatients(event: Event): void {
@@ -233,9 +200,9 @@ export class Patients implements OnInit {
     this.first = 0;
   }
 
-  onPageChange(event: { first: number; rows: number }) {
-    this.first = event.first;
-    this.rows = event.rows;
+  onPageChange(event: PaginatorState): void {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? this.rows;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

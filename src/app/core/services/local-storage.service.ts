@@ -6,11 +6,9 @@ import { CachedData } from './item.interface';
  * Proporciona métodos para guardar, recuperar y eliminar datos con soporte de TTL.
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LocalStorageService {
-  constructor() {}
-
   /**
    * Guarda datos en localStorage con opción de TTL (tiempo de expiración).
    * @param key - Clave para identificar el dato
@@ -20,7 +18,7 @@ export class LocalStorageService {
   save<T>(key: string, data: T, ttl?: number): void {
     const cachedData: CachedData<T> = {
       data,
-      expiresAt: ttl ? Date.now() + ttl : 0
+      expiresAt: ttl ? Date.now() + ttl : 0,
     };
 
     try {
@@ -32,7 +30,7 @@ export class LocalStorageService {
 
   /**
    * Recupera datos de localStorage validando si han expirado.
-   * @param key 
+   * @param key
    * @returns
    */
   get<T>(key: string): T | null {

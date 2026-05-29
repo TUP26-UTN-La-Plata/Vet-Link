@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Patient } from '../../features/patients/patients.interface';
@@ -8,7 +8,7 @@ import { PatientsApiService } from './items-api.service';
 /**
  * Servicio de estado que maneja la lógica de obtención de pacientes.
  * Implementa un sistema de caché inteligente con soporte de TTL.
- * 
+ *
  * Flujo:
  * 1. Componente solicita pacientes → getPatients()
  * 2. Verifica caché local
@@ -19,11 +19,13 @@ import { PatientsApiService } from './items-api.service';
  * 7. Componente se suscribe y recibe datos
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PatientsStateService {
   private readonly CACHE_KEY = 'patients_cache';
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutos en milisegundos
+  private readonly localStorageService = inject(LocalStorageService);
+  private readonly patientsApiService = inject(PatientsApiService);
 
   // BehaviorSubject para mantener el estado actual en memoria
   private patientsSubject = new BehaviorSubject<Patient[]>([]);
@@ -31,10 +33,7 @@ export class PatientsStateService {
   // Observable público para que los componentes se suscriban
   public patients$ = this.patientsSubject.asObservable();
 
-  constructor(
-    private localStorageService: LocalStorageService,
-    private patientsApiService: PatientsApiService
-  ) {
+  constructor() {
     this.initializeState();
   }
 
@@ -52,11 +51,11 @@ export class PatientsStateService {
     }
 
     return this.patientsApiService.getPatients().pipe(
-      tap(patients => {
+      tap((patients) => {
         this.localStorageService.save(this.CACHE_KEY, patients, this.CACHE_TTL);
         this.patientsSubject.next(patients);
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error('Error al obtener pacientes de la API:', error);
         return throwError(() => error);
       })
@@ -65,13 +64,13 @@ export class PatientsStateService {
 
   /**
    * Obtiene el estado actual de los pacientes sin hacer llamadas HTTP.
-   * @returns 
+   * @returns
    */
   getCurrentPatients(): Patient[] {
     return this.patientsSubject.value;
   }
 
-   /* Limpia el caché y el estado actual de pacientes.
+  /* Limpia el caché y el estado actual de pacientes.
    */
   clearCache(): void {
     this.localStorageService.remove(this.CACHE_KEY);
