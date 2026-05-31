@@ -1,11 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  Patient,
-  PatientsPaginatorPt,
-  SortCascadeGroup,
-  SortCascadeState,
-} from './patients.interface';
+import { Patient, PatientsPaginatorPt, SortCascadeOption } from './patients.interface';
 import { PatientsService } from './patients.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
