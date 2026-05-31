@@ -48,10 +48,6 @@ interface SortCascadeValue {
   prop: keyof Patient;
   order: 'asc' | 'desc';
 }
-interface SortCascadeValue {
-  prop: keyof Patient;
-  order: 'asc' | 'desc';
-}
 
 export interface SortCascadeOption {
   name?: string;
