@@ -15,9 +15,7 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(): Observable<boolean | UrlTree> {
-    return toObservable(this.authService.isAuthInitialized, {
-      injector: this.injector,
-    }).pipe(
+    return toObservable(this.authService.isLoaded, { injector: this.injector }).pipe(
       filter(Boolean),
       take(1),
       map(() =>

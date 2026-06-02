@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
-import { GuestGuard } from './core/guards/guest.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
   {
     path: 'login',
     title: 'Vet-Link - Inicio de Sesión',
-    canActivate: [GuestGuard],
+    canActivate: [guestGuard],
     loadComponent: () => import('./features/login/login').then(m => m.Login)
   },
   {

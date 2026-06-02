@@ -21,12 +21,11 @@ export interface UserData {
 })
 export class AuthService {
   #auth = getAuth(initializeApp(firebaseConfig));
-  #firebaseUser = signal<User | null>(null);
-  #isAuthInitialized = signal(false);
+  #firebaseUser = signal<User | null | undefined>(undefined);
 
   readonly authState = this.#firebaseUser.asReadonly();
-  readonly isAuthInitialized = this.#isAuthInitialized.asReadonly();
-  readonly isLoggedIn = computed(() => this.#firebaseUser() !== null);
+  readonly isLoaded = computed(() => this.#firebaseUser() !== undefined);
+  readonly isLoggedIn = computed(() => this.#firebaseUser() != null);
   readonly userData = computed<UserData | null>(() => {
     const user = this.#firebaseUser();
     if (!user) {
@@ -47,7 +46,6 @@ export class AuthService {
   #initializeFirebase(): void {
     onAuthStateChanged(this.#auth, (firebaseUser) => {
       this.#firebaseUser.set(firebaseUser);
-      this.#isAuthInitialized.set(true);
     });
   }
 
@@ -56,7 +54,36 @@ export class AuthService {
     await signInWithPopup(this.#auth, provider);
   }
 
-  logout = (): Promise<void> => signOut(this.#auth);
+  async logout(): Promise<void> {
+    await signOut(this.#auth);
+
+    try {
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.clear();
+        } catch (e) {
+          console.warn('Could not clear localStorage on logout', e);
+        }
+
+        try {
+          sessionStorage.clear();
+        } catch (e) {
+          console.warn('Could not clear sessionStorage on logout', e);
+        }
+
+        if ('caches' in window) {
+          try {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map((name) => caches.delete(name)));
+          } catch (e) {
+            console.warn('Could not clear Cache Storage on logout', e);
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error during logout cleanup', e);
+    }
+  }
 
   isLoggedInSnapshot(): boolean {
     return this.isLoggedIn();
@@ -78,4 +105,5 @@ export class AuthService {
       photoURL: user.photoURL || '/avatar.webp',
     };
   }
+
 }

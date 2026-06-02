@@ -18,13 +18,7 @@ export class Login {
 
   constructor() {
     effect(() => {
-      // Redirige automáticamente si el estado de autenticación ya está inicializado
-      // y el usuario ya está logueado. Esto evita usar un flag adicional
-      // para controlar intentos de login.
-      if (
-        this.#authService.isAuthInitialized() &&
-        this.#authService.isLoggedIn()
-      ) {
+      if (this.#authService.isLoaded() && this.#authService.isLoggedIn()) {
         this.#router.navigate(['/patients']);
       }
     });
