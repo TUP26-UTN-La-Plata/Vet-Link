@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Patient } from '../../features/patients/patients.interface';
 import { LocalStorageService } from './local-storage.service';
@@ -23,15 +23,12 @@ import { PatientsApiService } from './items-api.service';
 })
 export class PatientsStateService {
   private readonly CACHE_KEY = 'patients_cache';
-  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutos en milisegundos
+  private readonly CACHE_TTL = 5 * 60 * 1000;
   private readonly localStorageService = inject(LocalStorageService);
   private readonly patientsApiService = inject(PatientsApiService);
 
-  // BehaviorSubject para mantener el estado actual en memoria
-  private patientsSubject = new BehaviorSubject<Patient[]>([]);
-
-  // Observable público para que los componentes se suscriban
-  public patients$ = this.patientsSubject.asObservable();
+  private readonly patientsSubject = new BehaviorSubject<Patient[]>([]);
+  readonly patients$ = this.patientsSubject.asObservable();
 
   constructor() {
     this.initializeState();
@@ -45,9 +42,9 @@ export class PatientsStateService {
   getPatients(): Observable<Patient[]> {
     const cachedPatients = this.localStorageService.get<Patient[]>(this.CACHE_KEY);
 
-    if (cachedPatients) {
+    if (cachedPatients?.length) {
       this.patientsSubject.next(cachedPatients);
-      return this.patients$;
+      return of(cachedPatients);
     }
 
     return this.patientsApiService.getPatients().pipe(
@@ -92,7 +89,7 @@ export class PatientsStateService {
    */
   private initializeState(): void {
     const cachedPatients = this.localStorageService.get<Patient[]>(this.CACHE_KEY);
-    if (cachedPatients) {
+    if (cachedPatients?.length) {
       this.patientsSubject.next(cachedPatients);
     }
   }

@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Patient, PatientsPaginatorPt, SortCascadeOption } from './patients.interface';
 import { PatientsService } from './patients.service';
@@ -11,7 +12,6 @@ import { InputIconModule } from 'primeng/inputicon';
 import { CascadeSelectModule, CascadeSelectChangeEvent } from 'primeng/cascadeselect';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { Subscription } from 'rxjs';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
 
@@ -35,7 +35,7 @@ import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsver
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
-export class Patients implements OnInit, OnDestroy {
+export class Patients implements OnInit {
   patients: Patient[] = [];
   filteredPatients: Patient[] = [];
   loading = false;
@@ -74,15 +74,17 @@ export class Patients implements OnInit, OnDestroy {
     { icon: 'pi pi-bars', value: 'list' },
   ];
 
-  #patientsService = inject(PatientsService);
-  #cd = inject(ChangeDetectorRef);
-  #translocoService = inject(TranslocoService);
-  #langSubscription!: Subscription;
+  readonly #patientsService = inject(PatientsService);
+  readonly #cd = inject(ChangeDetectorRef);
+  readonly #destroyRef = inject(DestroyRef);
+  readonly #translocoService = inject(TranslocoService);
 
   ngOnInit(): void {
     this.loadData();
-    this.#langSubscription = this.#translocoService
+
+    this.#translocoService
       .selectTranslation('patients')
+      .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((translations) => {
         if (translations) {
           this.sortPlaceholder = translations['placeholderSort'] || '';
@@ -180,25 +182,28 @@ export class Patients implements OnInit, OnDestroy {
     this.loading = true;
     this.errorMessage = null;
 
-    this.#patientsService.getPatients().subscribe({
-      next: (data) => {
-        this.patients = data;
-        this.filteredPatients = [...data];
-        this.loading = false;
-        this.#cd.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error capturado:', error);
+    this.#patientsService
+      .getPatients()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.patients = data;
+          this.filteredPatients = [...data];
+          this.loading = false;
+          this.#cd.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error capturado:', error);
 
-        this.errorMessage =
-          'Lo sentimos, no pudimos sincronizar los datos con Vet-Link. Por favor, intenta de nuevo más tarde.';
+          this.errorMessage =
+            'Lo sentimos, no pudimos sincronizar los datos con Vet-Link. Por favor, intenta de nuevo más tarde.';
 
-        this.loading = false;
+          this.loading = false;
 
-        this.#cd.markForCheck();
-        this.#cd.detectChanges();
-      },
-    });
+          this.#cd.markForCheck();
+          this.#cd.detectChanges();
+        },
+      });
   }
 
   filterPatients(event: Event): void {
@@ -251,11 +256,5 @@ export class Patients implements OnInit, OnDestroy {
 
     this.#cd.markForCheck();
     this.#cd.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    if (this.#langSubscription) {
-      this.#langSubscription.unsubscribe();
-    }
   }
 }
