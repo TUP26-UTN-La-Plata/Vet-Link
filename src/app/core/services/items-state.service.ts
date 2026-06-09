@@ -22,13 +22,13 @@ import { PatientsApiService } from './items-api.service';
   providedIn: 'root',
 })
 export class PatientsStateService {
-  private readonly CACHE_KEY = 'patients_cache';
-  private readonly CACHE_TTL = 5 * 60 * 1000;
-  private readonly localStorageService = inject(LocalStorageService);
-  private readonly patientsApiService = inject(PatientsApiService);
+  readonly #CACHE_KEY = 'patients_cache';
+  readonly #CACHE_TTL = 5 * 60 * 1000;
+  readonly #localStorageService = inject(LocalStorageService);
+  readonly #patientsApiService = inject(PatientsApiService);
 
-  private readonly patientsSubject = new BehaviorSubject<Patient[]>([]);
-  readonly patients$ = this.patientsSubject.asObservable();
+  readonly #patientsSubject = new BehaviorSubject<Patient[]>([]);
+  readonly patients$ = this.#patientsSubject.asObservable();
 
   constructor() {
     this.initializeState();
@@ -40,17 +40,17 @@ export class PatientsStateService {
    * @returns
    */
   getPatients(): Observable<Patient[]> {
-    const cachedPatients = this.localStorageService.get<Patient[]>(this.CACHE_KEY);
+    const cachedPatients = this.#localStorageService.get<Patient[]>(this.#CACHE_KEY);
 
     if (cachedPatients?.length) {
-      this.patientsSubject.next(cachedPatients);
+      this.#patientsSubject.next(cachedPatients);
       return of(cachedPatients);
     }
 
-    return this.patientsApiService.getPatients().pipe(
+    return this.#patientsApiService.getPatients().pipe(
       tap((patients) => {
-        this.localStorageService.save(this.CACHE_KEY, patients, this.CACHE_TTL);
-        this.patientsSubject.next(patients);
+        this.#localStorageService.save(this.#CACHE_KEY, patients, this.#CACHE_TTL);
+        this.#patientsSubject.next(patients);
       }),
       catchError((error) => {
         console.error('Error al obtener pacientes de la API:', error);
@@ -64,14 +64,14 @@ export class PatientsStateService {
    * @returns
    */
   getCurrentPatients(): Patient[] {
-    return this.patientsSubject.value;
+    return this.#patientsSubject.value;
   }
 
   /* Limpia el caché y el estado actual de pacientes.
    */
   clearCache(): void {
-    this.localStorageService.remove(this.CACHE_KEY);
-    this.patientsSubject.next([]);
+    this.#localStorageService.remove(this.#CACHE_KEY);
+    this.#patientsSubject.next([]);
   }
 
   /**
@@ -88,9 +88,9 @@ export class PatientsStateService {
    * Se ejecuta automáticamente en el constructor.
    */
   private initializeState(): void {
-    const cachedPatients = this.localStorageService.get<Patient[]>(this.CACHE_KEY);
+    const cachedPatients = this.#localStorageService.get<Patient[]>(this.#CACHE_KEY);
     if (cachedPatients?.length) {
-      this.patientsSubject.next(cachedPatients);
+      this.#patientsSubject.next(cachedPatients);
     }
   }
 }

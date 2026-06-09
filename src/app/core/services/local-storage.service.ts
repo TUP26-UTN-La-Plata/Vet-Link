@@ -24,7 +24,7 @@ export class LocalStorageService {
     try {
       localStorage.setItem(key, JSON.stringify(cachedData));
     } catch (error) {
-      console.error(`Error al guardar en localStorage con clave "${key}":`, error);
+      console.error(`Failed to save to localStorage with key "${key}":`, error);
     }
   }
 
@@ -51,7 +51,7 @@ export class LocalStorageService {
 
       return cachedData.data;
     } catch (error) {
-      console.error(`Error al recuperar de localStorage con clave "${key}":`, error);
+      console.error(`Failed to retrieve from localStorage with key "${key}":`, error);
       return null;
     }
   }
@@ -64,7 +64,7 @@ export class LocalStorageService {
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      console.error(`Error al eliminar de localStorage con clave "${key}":`, error);
+      console.error(`Failed to remove from localStorage with key "${key}":`, error);
     }
   }
 
@@ -75,7 +75,7 @@ export class LocalStorageService {
     try {
       localStorage.clear();
     } catch (error) {
-      console.error('Error al limpiar localStorage:', error);
+      console.error('Failed to clear localStorage:', error);
     }
   }
 }

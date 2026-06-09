@@ -9,6 +9,8 @@ import { PatientsStateService } from '../../core/services/items-state.service';
 export class PatientsService {
   readonly #patientsStateService = inject(PatientsStateService);
 
+  readonly patients$ = this.#patientsStateService.patients$;
+
   getPatients(): Observable<Patient[]> {
     return this.#patientsStateService.getPatients();
   }

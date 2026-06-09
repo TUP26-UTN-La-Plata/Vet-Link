@@ -39,14 +39,14 @@ export class AuthService {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(this.#auth, provider);
     } catch (error) {
-      console.error('Error durante el login con Google:', error);
+      console.error('Error during Google login:', error);
       throw error;
     }
   }
 
   logout(): void {
     signOut(this.#auth).catch((error) => {
-      console.error('Error durante el logout:', error);
+      console.error('Error during logout:', error);
     });
   }
 

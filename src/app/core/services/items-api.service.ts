@@ -11,10 +11,9 @@ import { DogApiBreed, Patient } from '../../features/patients/patients.interface
   providedIn: 'root',
 })
 export class PatientsApiService {
-  private readonly API_URL = 'https://api.thedogapi.com/v1/breeds';
-  private readonly API_KEY =
-    'live_ePinWLFEmQECQTjlVDJ8yZQ6f3j8c92HdxPwQKwMKgO6cEdnoETYF2Q2ojviwcUa';
-  private readonly http = inject(HttpClient);
+  readonly #API_URL = 'https://api.thedogapi.com/v1/breeds';
+  readonly #API_KEY = 'live_ePinWLFEmQECQTjlVDJ8yZQ6f3j8c92HdxPwQKwMKgO6cEdnoETYF2Q2ojviwcUa';
+  readonly #http = inject(HttpClient);
 
   /**
    * Obtiene la lista completa de pacientes (razas) desde The Dog API.
@@ -22,13 +21,15 @@ export class PatientsApiService {
    */
   getPatients(): Observable<Patient[]> {
     const headers = new HttpHeaders({
-      'x-api-key': this.API_KEY,
+      'x-api-key': this.#API_KEY,
     });
 
-    return this.http
-      .get<DogApiBreed[]>(this.API_URL, { headers })
+    return this.#http
+      .get<DogApiBreed[]>(this.#API_URL, { headers })
       .pipe(
-        map((apiData: DogApiBreed[]) => apiData.map((item: DogApiBreed) => this.mapToPatient(item)))
+        map((apiData: DogApiBreed[]) =>
+          apiData.map((item: DogApiBreed) => this.#mapToPatient(item))
+        )
       );
   }
 
@@ -37,7 +38,7 @@ export class PatientsApiService {
    * @param item
    * @returns
    */
-  private mapToPatient(item: DogApiBreed): Patient {
+  #mapToPatient(item: DogApiBreed): Patient {
     const imageUrl =
       item.image?.url ||
       (item.reference_image_id
@@ -48,10 +49,11 @@ export class PatientsApiService {
       id: Number(item.id),
       name: item.name,
       image: imageUrl,
-      description: item.description || item.temperament || item.bred_for || 'Sin descripción',
-      averageWeight: this.calculateAverage(item.weight?.metric),
-      averageHeight: this.calculateAverage(item.height?.metric),
-      origin: item.origin || 'Desconocido',
+      description:
+        item.description || item.temperament || item.bred_for || 'patients.no_description',
+      averageWeight: this.#calculateAverage(item.weight?.metric),
+      averageHeight: this.#calculateAverage(item.height?.metric),
+      origin: item.origin || 'patients.unknown',
     };
   }
 
@@ -60,7 +62,7 @@ export class PatientsApiService {
    * @param range
    * @returns
    */
-  private calculateAverage(range?: string): number {
+  #calculateAverage(range?: string): number {
     if (!range) return 0;
 
     const numbers = range.match(/\d+(\.\d+)?/g)?.map(Number);
