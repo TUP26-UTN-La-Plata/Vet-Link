@@ -1,20 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CachedData } from './item.interface';
 
-/**
- * Servicio encargado de manejar todas las operaciones con localStorage.
- * Proporciona métodos para guardar, recuperar y eliminar datos con soporte de TTL.
- */
 @Injectable({
   providedIn: 'root',
 })
 export class LocalStorageService {
-  /**
-   * Guarda datos en localStorage con opción de TTL (tiempo de expiración).
-   * @param key - Clave para identificar el dato
-   * @param data - Datos a guardar
-   * @param ttl - Tiempo de vida en milisegundos
-   */
   save<T>(key: string, data: T, ttl?: number): void {
     const cachedData: CachedData<T> = {
       data,
@@ -28,11 +18,6 @@ export class LocalStorageService {
     }
   }
 
-  /**
-   * Recupera datos de localStorage validando si han expirado.
-   * @param key
-   * @returns
-   */
   get<T>(key: string): T | null {
     try {
       const item = localStorage.getItem(key);
@@ -43,7 +28,6 @@ export class LocalStorageService {
 
       const cachedData: CachedData<T> = JSON.parse(item);
 
-      // Validar si el dato ha expirado
       if (cachedData.expiresAt !== 0 && Date.now() > cachedData.expiresAt) {
         this.remove(key);
         return null;
@@ -56,10 +40,6 @@ export class LocalStorageService {
     }
   }
 
-  /**
-   * Elimina un dato específico de localStorage.
-   * @param key - Clave del dato a eliminar
-   */
   remove(key: string): void {
     try {
       localStorage.removeItem(key);
@@ -68,9 +48,6 @@ export class LocalStorageService {
     }
   }
 
-  /**
-   * Limpia completamente el localStorage.
-   */
   clear(): void {
     try {
       localStorage.clear();

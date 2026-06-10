@@ -3,10 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { DogApiBreed, Patient } from '../../features/patients/patients.interface';
 
-/**
- * Servicio encargado exclusivamente de las llamadas HTTP a la API de Patients.
- * Responsabilidad única: realizar peticiones HTTP y mapear respuestas.
- */
 @Injectable({
   providedIn: 'root',
 })
@@ -15,10 +11,6 @@ export class PatientsApiService {
   readonly #API_KEY = 'live_ePinWLFEmQECQTjlVDJ8yZQ6f3j8c92HdxPwQKwMKgO6cEdnoETYF2Q2ojviwcUa';
   readonly #http = inject(HttpClient);
 
-  /**
-   * Obtiene la lista completa de pacientes (razas) desde The Dog API.
-   * @returns
-   */
   getPatients(): Observable<Patient[]> {
     const headers = new HttpHeaders({
       'x-api-key': this.#API_KEY,
@@ -33,11 +25,6 @@ export class PatientsApiService {
       );
   }
 
-  /**
-   * Mapea la respuesta de la API al modelo Patient.
-   * @param item
-   * @returns
-   */
   #mapToPatient(item: DogApiBreed): Patient {
     const imageUrl =
       item.image?.url ||
@@ -57,11 +44,6 @@ export class PatientsApiService {
     };
   }
 
-  /**
-   * Calcula el promedio de un rango (ej: "10 - 20" → 15).
-   * @param range
-   * @returns
-   */
   #calculateAverage(range?: string): number {
     if (!range) return 0;
 

@@ -5,19 +5,6 @@ import { Patient } from '../../features/patients/patients.interface';
 import { LocalStorageService } from './local-storage.service';
 import { PatientsApiService } from './items-api.service';
 
-/**
- * Servicio de estado que maneja la lógica de obtención de pacientes.
- * Implementa un sistema de caché inteligente con soporte de TTL.
- *
- * Flujo:
- * 1. Componente solicita pacientes → getPatients()
- * 2. Verifica caché local
- * 3. Si existe y es válido → devuelve del caché
- * 4. Si no → llama a PatientsApiService (HTTP)
- * 5. Guarda resultado en localStorage con TTL
- * 6. Actualiza BehaviorSubject
- * 7. Componente se suscribe y recibe datos
- */
 @Injectable({
   providedIn: 'root',
 })
@@ -34,11 +21,6 @@ export class PatientsStateService {
     this.initializeState();
   }
 
-  /**
-   * Método principal que devuelve los pacientes.
-   * Implementa la lógica: caché → API → guardar en caché
-   * @returns
-   */
   getPatients(): Observable<Patient[]> {
     const cachedPatients = this.#localStorageService.get<Patient[]>(this.#CACHE_KEY);
 
@@ -59,10 +41,6 @@ export class PatientsStateService {
     );
   }
 
-  /**
-   * Obtiene el estado actual de los pacientes sin hacer llamadas HTTP.
-   * @returns
-   */
   getCurrentPatients(): Patient[] {
     return this.#patientsSubject.value;
   }
@@ -74,19 +52,11 @@ export class PatientsStateService {
     this.#patientsSubject.next([]);
   }
 
-  /**
-   * Fuerza una recarga de pacientes desde la API,
-   * @returns
-   */
   refreshPatients(): Observable<Patient[]> {
     this.clearCache();
     return this.getPatients();
   }
 
-  /**
-   * Inicializa el estado cargando pacientes del caché si existen.
-   * Se ejecuta automáticamente en el constructor.
-   */
   private initializeState(): void {
     const cachedPatients = this.#localStorageService.get<Patient[]>(this.#CACHE_KEY);
     if (cachedPatients?.length) {

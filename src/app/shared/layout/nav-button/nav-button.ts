@@ -14,6 +14,5 @@ export class NavButton {
   @Input({ required: true }) label = 'NavButton';
   @Input({ required: true }) icon = 'pi pi-home';
   @Input({ required: true }) routerLink = '/';
-  /** `bottom`: icon + label stacked for mobile tab bar */
   @Input() variant: NavButtonVariant = 'sidebar';
 }
