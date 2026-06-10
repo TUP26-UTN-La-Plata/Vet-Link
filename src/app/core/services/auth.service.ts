@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -21,7 +22,9 @@ export interface UserData {
 })
 export class AuthService {
   #auth = getAuth(initializeApp(firebaseConfig));
+  #router = inject(Router);
   #firebaseUser = signal<User | null | undefined>(undefined);
+  #isSigningOut = false;
 
   readonly authState = this.#firebaseUser.asReadonly();
   readonly isLoaded = computed(() => this.#firebaseUser() !== undefined);
@@ -44,8 +47,14 @@ export class AuthService {
   }
 
   #initializeFirebase(): void {
-    onAuthStateChanged(this.#auth, (firebaseUser) => {
+    onAuthStateChanged(this.#auth, async (firebaseUser) => {
       this.#firebaseUser.set(firebaseUser);
+      
+      if (firebaseUser === null && this.#isSigningOut) {
+        await this.#clearBrowserState();
+        this.#isSigningOut = false;
+        await this.#router.navigate(['/login']);
+      }
     });
   }
 
@@ -55,33 +64,42 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
-    await signOut(this.#auth);
+    this.#isSigningOut = true;
 
+    try {
+      await signOut(this.#auth);
+    } catch (error) {
+      this.#isSigningOut = false;
+      throw error;
+    }
+  }
+
+  async #clearBrowserState(): Promise<void> {
     try {
       if (typeof window !== 'undefined') {
         try {
           localStorage.clear();
-        } catch (e) {
-          console.warn('Could not clear localStorage on logout', e);
+        } catch (error) {
+          console.warn('Could not clear localStorage on logout', error);
         }
 
         try {
           sessionStorage.clear();
-        } catch (e) {
-          console.warn('Could not clear sessionStorage on logout', e);
+        } catch (error) {
+          console.warn('Could not clear sessionStorage on logout', error);
         }
 
         if ('caches' in window) {
           try {
             const cacheNames = await caches.keys();
             await Promise.all(cacheNames.map((name) => caches.delete(name)));
-          } catch (e) {
-            console.warn('Could not clear Cache Storage on logout', e);
+          } catch (error) {
+            console.warn('Could not clear Cache Storage on logout', error);
           }
         }
       }
-    } catch (e) {
-      console.error('Error during logout cleanup', e);
+    } catch (error) {
+      console.error('Error during logout cleanup', error);
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
@@ -9,16 +9,16 @@ import { AuthService } from '@core/services/auth.service';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements OnInit {
   isLoading = signal(false);
   loginError = signal<string | null>(null);
 
   #router = inject(Router);
   #authService = inject(AuthService);
 
-  constructor() {
+  ngOnInit(): void {
     effect(() => {
-      if (this.#authService.isLoaded() && this.#authService.isLoggedIn()) {
+      if (this.#authService.isLoggedIn()) {
         this.#router.navigate(['/patients']);
       }
     });
