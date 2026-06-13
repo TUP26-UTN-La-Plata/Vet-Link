@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
@@ -11,14 +11,14 @@ import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login implements OnInit {
+export class Login {
   isLoading = signal(false);
   loginError = signal<string | null>(null);
 
   #router = inject(Router);
   #authService = inject(AuthService);
 
-  ngOnInit(): void {
+  constructor() {
     effect(() => {
       if (this.#authService.isLoggedIn()) {
         this.#router.navigate(['/patients']);
@@ -36,7 +36,7 @@ export class Login implements OnInit {
 
     try {
       await this.#authService.loginWithGoogle();
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.loginError.set(
         error instanceof Error ? error.message : 'Error al iniciar sesión con Google'
       );
