@@ -1,21 +1,27 @@
-<div class="flex h-full min-h-0 w-full flex-col rounded-xl bg-card shadow-md">
-  <div class="flex w-full flex-row justify-between gap-4 border-b-2 border-neutral/20 p-4 pb-4">
-    <div class="flex justify-center items-center w-32">
-      <img [src]="authService.userData()?.photoURL || '/avatar.webp'" alt="Avatar" class="h-16 w-16 rounded-full" (error)="$event.target.src = '/avatar.webp'">
+<ng-container *transloco="let g">
+  <div class="flex h-full min-h-0 w-full flex-col rounded-xl bg-card shadow-md">
+    <div class="flex w-full flex-row justify-between gap-4 border-b-2 border-neutral/20 p-4 pb-4">
+      <div class="flex justify-center items-center w-32">
+        <img
+          [src]="authService.userData()?.photoURL || '/avatar.webp'"
+          alt="Avatar"
+          class="h-16 w-16 rounded-full"
+          (error)="$event.target.src = '/avatar.webp'" />
+      </div>
+      <div class="flex flex-col justify-center items-start w-full">
+        <h4>
+          {{ authService.userData()?.name || authService.userData()?.email || 'Usuario' }}
+        </h4>
+        @if (authService.userData()?.email) {
+          <p class="text-sm text-muted">
+            {{ authService.userData()?.email }}
+          </p>
+        } @else {
+          <p class="text-sm text-muted">
+            {{ g('connectedUser') }}
+          </p>
+        }
+      </div>
     </div>
-    <div class="flex flex-col justify-center items-start w-full">
-      <h4>
-        {{ authService.userData()?.name || authService.userData()?.email || 'Usuario' }}
-      </h4>
-      @if (authService.userData()?.email) {
-      <p class="text-sm text-muted">
-        {{ authService.userData()?.email }}
-      </p>
-      } @else {
-      <p class="text-sm text-muted">
-        Usuario conectado
-      </p>
-      }
-    </div>
-  </div></ng-container
->
+  </div>
+</ng-container>
