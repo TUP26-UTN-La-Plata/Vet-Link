@@ -2,11 +2,10 @@ import { isPlatformBrowser } from '@angular/common';
 import { afterNextRender, Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { APP_VERSION } from '../../../shared/utils/app-version';
 import { getClientEnvironment } from '../../../shared/utils/client-environment';
-import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-user-agent-card',
-  imports: [TranslocoModule],
+  imports: [],
   templateUrl: './user-agent-card.html',
   styleUrl: './user-agent-card.css',
 })

@@ -1,178 +1,112 @@
-import { Component, ChangeDetectorRef, DestroyRef, OnInit, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Patient, PatientsPaginatorPt, SortCascadeOption } from './patients.interface';
 import { PatientsService } from './patients.service';
+import { Patient } from './patients.interface';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
+import { IconFieldModule } from 'primeng/iconfield'
+import { InputIconModule } from 'primeng/inputicon'
 import { CascadeSelectModule, CascadeSelectChangeEvent } from 'primeng/cascadeselect';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { PaginatorModule, PaginatorState } from 'primeng/paginator';
-import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
+import { delay } from 'rxjs';
+import { PaginatorModule } from 'primeng/paginator';
 
 @Component({
   selector: 'app-patients',
-  imports: [
-    FormsModule,
-    ProgressSpinnerModule,
-    MessageModule,
-    CardModule,
-    InputTextModule,
-    IconFieldModule,
-    InputIconModule,
-    CascadeSelectModule,
-    DataViewModule,
-    SelectButtonModule,
-    PaginatorModule,
-    TranslocoModule,
-  ],
-  providers: [PatientsService, provideTranslocoScope('patients')],
+  imports: [FormsModule, ProgressSpinnerModule, MessageModule, CardModule, InputTextModule, IconFieldModule, InputIconModule, CascadeSelectModule, DataViewModule, SelectButtonModule, PaginatorModule],
+  providers: [PatientsService],
   templateUrl: './patients.html',
   styleUrl: './patients.css',
 })
 export class Patients implements OnInit {
   patients: Patient[] = [];
   filteredPatients: Patient[] = [];
-  loading = false;
+  loading: boolean = false;
   errorMessage: string | null = null;
-  sortPlaceholder = '';
-  selectedSort: SortCascadeOption | null = null;
-  sortOptions: SortCascadeOption[] = [];
-
-  first = 0;
-  rows = 12;
-  paginatorPt: PatientsPaginatorPt = {
-    root: {
-      class:
-        '!bg-white/80 !backdrop-blur-md !border !border-neutral/20 !shadow-xl !rounded-full !px-6 !py-1 !flex !items-center !justify-center',
+  sortOptions: any[] = [
+    {
+      name: 'Nombre',
+      code: 'name',
+      states: [
+        { label: 'A-Z', category: 'Nombre', icon: 'pi pi-sort-alpha-down', value: { prop: 'name', order: 'asc' } },
+        { label: 'Z-A', category: 'Nombre', icon: 'pi pi-sort-alpha-up', value: { prop: 'name', order: 'desc' } }
+      ]
     },
-    page: (options: { context?: { active?: boolean } }) => ({
+    {
+      name: 'Origen',
+      code: 'origin',
+      states: [
+        { label: 'A-Z', category: 'Origen', icon: 'pi pi-sort-alpha-down', value: { prop: 'origin', order: 'asc' } },
+        { label: 'Z-A', category: 'Origen', icon: 'pi pi-sort-alpha-up', value: { prop: 'origin', order: 'desc' } }
+      ]
+    },
+    {
+      name: 'Peso',
+      code: 'weight',
+      states: [
+        { label: 'Menor a Mayor', category: 'Peso', icon: 'pi pi-sort-numeric-down', value: { prop: 'averageWeight', order: 'asc' } },
+        { label: 'Mayor a Menor', category: 'Peso', icon: 'pi pi-sort-numeric-up', value: { prop: 'averageWeight', order: 'desc' } }
+      ]
+    },
+    {
+      name: 'Altura',
+      code: 'height',
+      states: [
+        { label: 'Menor a Mayor', category: 'Altura', icon: 'pi pi-sort-numeric-down', value: { prop: 'averageHeight', order: 'asc' } },
+        { label: 'Mayor a Menor', category: 'Altura', icon: 'pi pi-sort-numeric-up', value: { prop: 'averageHeight', order: 'desc' } }
+      ]
+    }
+  ];
+  selectedSort: any = null;
+
+  first: number = 0;
+  rows: number = 12;
+  paginatorPt: any = {
+    root: {
+      class: '!bg-white/80 !backdrop-blur-md !border !border-neutral/20 !shadow-xl !rounded-full !px-6 !py-1 !flex !items-center !justify-center'
+    },
+    // Nota: Usamos encadenamiento opcional context?.active
+    page: ({ context }: any) => ({
       class: [
         '!rounded-full !min-w-[40px] !h-[40px] !flex !items-center !justify-center !transition-all',
-        options.context?.active
+        context?.active
           ? '!bg-neutral !text-white !font-bold'
-          : '!text-neutral/70 hover:!bg-neutral/10',
-      ].join(' '),
+          : '!text-neutral/70 hover:!bg-neutral/10'
+      ].join(' ')
     }),
+    // Simplificamos los botones de acción
     nextbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
     prevbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
     firstbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
     lastbutton: { root: { class: '!text-neutral !rounded-full hover:!bg-neutral/10' } },
     current: {
-      class: 'text-[10px] font-bold uppercase tracking-tighter text-muted mr-4',
-    },
+      class: 'text-[10px] font-bold uppercase tracking-tighter text-muted mr-4'
+    }
   };
 
   layout: 'grid' | 'list' = 'grid';
   layoutOptions = [
     { icon: 'pi pi-th-large', value: 'grid' },
-    { icon: 'pi pi-bars', value: 'list' },
+    { icon: 'pi pi-bars', value: 'list' }
   ];
 
-  readonly #patientsService = inject(PatientsService);
-  readonly #cd = inject(ChangeDetectorRef);
-  readonly #destroyRef = inject(DestroyRef);
-  readonly #translocoService = inject(TranslocoService);
+  #patientsService: PatientsService;
+  #cd: ChangeDetectorRef;
+
+  constructor(
+    patientsService: PatientsService,
+    cd: ChangeDetectorRef
+  ) {
+    this.#patientsService = patientsService;
+    this.#cd = cd;
+  }
 
   ngOnInit(): void {
-    this.loadData();
-
-    this.#translocoService
-      .selectTranslation('patients')
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe((translations) => {
-        if (translations) {
-          this.sortPlaceholder = translations['placeholderSort'] || '';
-          this.#initializeSortOptions(translations);
-        }
-      });
-  }
-
-  #initializeSortOptions(t: Record<string, unknown>): void {
-    const sort = t['sort'] as Record<string, string> | undefined;
-
-    this.sortOptions = [
-      {
-        name: sort?.['name'] || 'Nombre',
-        code: 'name',
-        states: [
-          {
-            label: sort?.['ascendant'] || 'Ascendente',
-            category: sort?.['name'] || 'Nombre',
-            icon: 'pi pi-sort-alpha-down',
-            value: { prop: 'name', order: 'asc' },
-          },
-          {
-            label: sort?.['descendant'] || 'Descendente',
-            category: sort?.['name'] || 'Nombre',
-            icon: 'pi pi-sort-alpha-up',
-            value: { prop: 'name', order: 'desc' },
-          },
-        ],
-      },
-      {
-        name: sort?.['origin'] || 'Origen',
-        code: 'origin',
-        states: [
-          {
-            label: sort?.['ascendant'] || 'Ascendente',
-            category: sort?.['origin'] || 'Origen',
-            icon: 'pi pi-sort-alpha-down',
-            value: { prop: 'origin', order: 'asc' },
-          },
-          {
-            label: sort?.['descendant'] || 'Descendente',
-            category: sort?.['origin'] || 'Origen',
-            icon: 'pi pi-sort-alpha-up',
-            value: { prop: 'origin', order: 'desc' },
-          },
-        ],
-      },
-      {
-        name: sort?.['averageWeight'] || 'Peso Promedio',
-        code: 'averageWeight',
-        states: [
-          {
-            label: sort?.['lessToMore'] || 'Menos a Más',
-            category: sort?.['averageWeight'] || 'Peso Promedio',
-            icon: 'pi pi-sort-numeric-down',
-            value: { prop: 'averageWeight', order: 'asc' },
-          },
-          {
-            label: sort?.['moreToLess'] || 'Más a Menos',
-            category: sort?.['averageWeight'] || 'Peso Promedio',
-            icon: 'pi pi-sort-numeric-up',
-            value: { prop: 'averageWeight', order: 'desc' },
-          },
-        ],
-      },
-      {
-        name: sort?.['averageHeight'] || 'Altura Promedio',
-        code: 'averageHeight',
-        states: [
-          {
-            label: sort?.['lessToMore'] || 'Menos a Más',
-            category: sort?.['averageHeight'] || 'Altura Promedio',
-            icon: 'pi pi-sort-numeric-down',
-            value: { prop: 'averageHeight', order: 'asc' },
-          },
-          {
-            label: sort?.['moreToLess'] || 'Más a Menos',
-            category: sort?.['averageHeight'] || 'Altura Promedio',
-            icon: 'pi pi-sort-numeric-up',
-            value: { prop: 'averageHeight', order: 'desc' },
-          },
-        ],
-      },
-    ];
-
-    this.#cd.detectChanges();
-  }
+    this.loadData()
+  };
 
   get paginatedPatients() {
     return this.filteredPatients.slice(this.first, this.first + this.rows);
@@ -182,53 +116,48 @@ export class Patients implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    this.#patientsService
-      .getPatients()
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe({
-        next: (data) => {
-          this.patients = data;
-          this.filteredPatients = [...data];
-          this.loading = false;
-          this.#cd.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error capturado:', error);
+    this.#patientsService.getPatients().pipe(delay(2000)).subscribe({
+      next: (data) => {
+        this.patients = data;
+        this.filteredPatients = [...data];
+        this.loading = false;
+        this.#cd.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error capturado:', error);
 
-          this.errorMessage =
-            'Lo sentimos, no pudimos sincronizar los datos con Vet-Link. Por favor, intenta de nuevo más tarde.';
+        this.errorMessage = 'Lo sentimos, no pudimos sincronizar los datos con Vet-Link. Por favor, intenta de nuevo más tarde.';
 
-          this.loading = false;
+        this.loading = false;
 
-          this.#cd.markForCheck();
-          this.#cd.detectChanges();
-        },
-      });
+        this.#cd.markForCheck();
+        this.#cd.detectChanges();
+      }
+    });
   }
 
   filterPatients(event: Event): void {
     const searchInput = (event.target as HTMLInputElement).value.toLowerCase();
 
-    this.filteredPatients = this.patients.filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchInput) ||
-        p.description.toLowerCase().includes(searchInput) ||
-        p.origin.toLowerCase().includes(searchInput) ||
-        p.averageWeight.toString().includes(searchInput) ||
-        p.averageHeight.toString().includes(searchInput)
+    this.filteredPatients = this.patients.filter(p =>
+      p.name.toLowerCase().includes(searchInput) ||
+      p.description.toLowerCase().includes(searchInput) ||
+      p.origin.toLowerCase().includes(searchInput) ||
+      p.averageWeight.toString().includes(searchInput) ||
+      p.averageHeight.toString().includes(searchInput)
     );
 
     this.first = 0;
   }
 
-  onPageChange(event: PaginatorState) {
-    this.first = event.first ?? 0;
-    this.rows = event.rows ?? 12;
+  onPageChange(event: any) {
+    this.first = event.first;
+    this.rows = event.rows;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   sortPatients(event: CascadeSelectChangeEvent) {
-    const selection = event.value as SortCascadeOption | null;
+    const selection = event.value;
 
     if (!selection || !selection.value) {
       this.selectedSort = null;

@@ -1,11 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { AuthService } from '@core/services/auth.service';
-import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
   standalone: true,
   selector: 'app-layout-header',
-  imports: [TranslocoModule],
+  imports: [],
   templateUrl: './layout-header.html',
   styleUrl: './layout-header.css',
 })

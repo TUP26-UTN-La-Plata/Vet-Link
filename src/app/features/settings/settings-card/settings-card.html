@@ -1,6 +1,9 @@
-<ng-container *transloco="let t; read: 'settings.settings-card'">
   <div class="flex justify-end items-end w-full">
-    <app-action-button label="{{t('buttonLogout')}}" icon="pi pi-sign-out" variant="danger" (clicked)="onSignOutClick()"
-      class="pointer-fine:" />
+    <app-action-button
+      label="Cerrar sesión"
+      icon="pi pi-sign-out"
+      variant="danger"
+      (clicked)="onSignOutClick()"
+      class="pointer-fine:"
+    />
   </div>
-</ng-container>
