@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, effect, inject } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
@@ -14,44 +14,29 @@ import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
 export class Login implements OnInit {
   isLoading = signal(false);
   loginError = signal<string | null>(null);
-  #hasAttemptedLogin = signal(false);
 
   #router = inject(Router);
   #authService = inject(AuthService);
 
-  constructor() {
+  ngOnInit(): void {
     effect(() => {
-      const isAuthenticated = this.#authService.isLoggedIn();
-      const hasAttempted = this.#hasAttemptedLogin();
-
-      if (isAuthenticated && hasAttempted) {
+      if (this.#authService.isLoggedIn()) {
         this.#router.navigate(['/patients']);
-        this.#hasAttemptedLogin.set(false);
       }
     });
   }
 
-  ngOnInit(): void {
-    this.#checkExistingSession();
-  }
-
-  #checkExistingSession(): void {
-    if (this.#authService.isLoggedIn()) {
-      this.#router.navigate(['/patients']);
+  async loginWithGoogle(): Promise<void> {
+    if (this.isLoading()) {
+      return;
     }
-  }
-
-  async handleLogin(): Promise<void> {
-    if (this.isLoading()) return;
 
     this.isLoading.set(true);
     this.loginError.set(null);
 
     try {
-      this.#hasAttemptedLogin.set(true);
       await this.#authService.loginWithGoogle();
-    } catch (error: unknown) {
-      this.#hasAttemptedLogin.set(false);
+    } catch (error: any) {
       this.loginError.set(
         error instanceof Error ? error.message : 'Error al iniciar sesión con Google'
       );
@@ -59,9 +44,5 @@ export class Login implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  async loginWithGoogle(): Promise<void> {
-    await this.handleLogin();
   }
 }

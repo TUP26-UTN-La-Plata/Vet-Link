@@ -12,8 +12,8 @@
         <i class="pi pi-bell"></i>
         <i class="pi pi-question-circle"></i>
         <img
-          [src]="authService.getUserData()?.photoURL || '/avatar.webp'"
-          [alt]="authService.getUserData()?.name || g('common.altAvatar')"
+          [src]="authService.userData()?.photoURL || '/avatar.webp'"
+          [alt]="authService.userData()?.name || 'Avatar'"
           class="h-8 w-8 rounded-full object-cover"
           (error)="$event.target.src = '/avatar.webp'" />
       </div>
