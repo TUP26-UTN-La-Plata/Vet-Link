@@ -7,7 +7,12 @@
       <div class="flex items-center justify-end gap-8">
         <i class="pi pi-bell"></i>
         <i class="pi pi-question-circle"></i>
-        <img src="/avatar.webp" alt="Avatar" class="h-8 w-8 rounded-full" />
+        <img
+          [src]="authService.userData()?.photoURL || '/avatar.webp'"
+          [alt]="authService.userData()?.name || 'Avatar'"
+          class="h-8 w-8 rounded-full object-cover"
+          (error)="$event.target.src = '/avatar.webp'"
+        />
       </div>
     </div>
   </header>

@@ -1,24 +1,24 @@
-import { Injectable } from "@angular/core";
-import { CanActivate, Router } from "@angular/router";
-import { AuthService } from "../services/auth.service";
+import { inject, Injector } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { filter, map, take } from 'rxjs/operators';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { AuthService } from '../services/auth.service';
 
+export const guestGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const injector = inject(Injector);
 
-@Injectable({
-  providedIn: 'root',
-})
+  return toObservable(authService.isLoaded, { injector }).pipe(
+    filter((loaded): loaded is true => loaded === true),
+    take(1),
+    map(() => {
+      if (authService.isLoggedIn()) {
+        router.navigate(['/patients']);
+        return false;
+      }
 
-export class GuestGuard implements CanActivate {
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
-
-  canActivate(): boolean {
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/patients']);
-      return false;
-    }
-
-    return true;
-  }
-}
+      return true;
+    })
+  );
+};

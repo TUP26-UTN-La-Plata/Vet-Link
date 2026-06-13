@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -11,24 +11,37 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class Login implements OnInit {
   isLoading = signal(false);
+  loginError = signal<string | null>(null);
 
-  constructor(
-    private router: Router,
-    private authService: AuthService
-  ) {}
+  #router = inject(Router);
+  #authService = inject(AuthService);
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    effect(() => {
+      if (this.#authService.isLoggedIn()) {
+        this.#router.navigate(['/patients']);
+      }
+    });
+  }
 
-  handleLogin(): void {
-    if (this.isLoading()) return; // Evita múltiples clics
+  async loginWithGoogle(): Promise<void> {
+    if (this.isLoading()) {
+      return;
+    }
 
     this.isLoading.set(true);
+    this.loginError.set(null);
 
-    setTimeout(() => {
-      this.authService.login();
+    try {
+      await this.#authService.loginWithGoogle();
+    } catch (error: any) {
+      this.loginError.set(
+        error?.message || 'Error al iniciar sesión con Google'
+      );
+      console.error('Error en login:', error);
+    } finally {
       this.isLoading.set(false);
-      this.router.navigate(['/patients']);
-    }, 2000);
+    }
   }
 }
 

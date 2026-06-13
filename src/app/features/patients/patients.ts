@@ -93,10 +93,16 @@ export class Patients implements OnInit {
     { icon: 'pi pi-bars', value: 'list' }
   ];
 
+  #patientsService: PatientsService;
+  #cd: ChangeDetectorRef;
+
   constructor(
-    private patientsService: PatientsService,
-    private cd: ChangeDetectorRef
-  ) { }
+    patientsService: PatientsService,
+    cd: ChangeDetectorRef
+  ) {
+    this.#patientsService = patientsService;
+    this.#cd = cd;
+  }
 
   ngOnInit(): void {
     this.loadData()
@@ -110,12 +116,12 @@ export class Patients implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    this.patientsService.getPatients().subscribe({
+    this.#patientsService.getPatients().pipe(delay(2000)).subscribe({
       next: (data) => {
         this.patients = data;
         this.filteredPatients = [...data];
         this.loading = false;
-        this.cd.detectChanges();
+        this.#cd.detectChanges();
       },
       error: (error) => {
         console.error('Error capturado:', error);
@@ -124,8 +130,8 @@ export class Patients implements OnInit {
 
         this.loading = false;
 
-        this.cd.markForCheck();
-        this.cd.detectChanges();
+        this.#cd.markForCheck();
+        this.#cd.detectChanges();
       }
     });
   }
@@ -156,7 +162,7 @@ export class Patients implements OnInit {
     if (!selection || !selection.value) {
       this.selectedSort = null;
       this.filteredPatients = [...this.patients];
-      this.cd.detectChanges();
+      this.#cd.detectChanges();
       return;
     }
 
@@ -177,7 +183,7 @@ export class Patients implements OnInit {
       return order === 'asc' ? result : -result;
     });
 
-    this.cd.markForCheck();
-    this.cd.detectChanges();
+    this.#cd.markForCheck();
+    this.#cd.detectChanges();
   }
 }

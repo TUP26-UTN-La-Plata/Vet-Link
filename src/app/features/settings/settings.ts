@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { ConfirmModal } from '../../shared/components/confirm-modal/confirm-modal';
+import { AuthService } from '@core/services/auth.service';
+import { ConfirmModal } from '@shared/components/confirm-modal/confirm-modal';
 import { UserAgentCard } from './user-agent-card/user-agent-card';
 import { ProfileCard } from './profile-card/profile-card';
 import { SettingsCard } from './settings-card/settings-card';
@@ -13,7 +12,6 @@ import { SettingsCard } from './settings-card/settings-card';
   styleUrl: './settings.css',
 })
 export class Settings {
-  private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
   protected logoutModalOpen = false;
@@ -26,9 +24,8 @@ export class Settings {
     this.logoutModalOpen = false;
   }
 
-  protected onLogoutConfirm(): void {
+  protected async onLogoutConfirm(): Promise<void> {
     this.logoutModalOpen = false;
-    this.authService.logout();
-    void this.router.navigate(['/login']);
+    await this.authService.logout();
   }
 }
