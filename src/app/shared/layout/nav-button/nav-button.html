@@ -1,25 +1,20 @@
 @if (variant === 'sidebar') {
-  <a
-    [routerLink]="routerLink"
-    routerLinkActive="bg-primary/20 text-secondary hover:bg-primary/20"
-    [routerLinkActiveOptions]="{ exact: true }"
-    class="relative flex h-8 w-full items-center gap-4 rounded-r-sm px-4 transition-all duration-500 group text-muted hover:bg-primary/10">
+  <a [routerLink]="routerLink"
+     routerLinkActive="bg-primary/20 text-secondary hover:bg-primary/20"
+     [routerLinkActiveOptions]="{ exact: true }"
+     class="relative flex h-8 w-full items-center gap-4 rounded-r-sm px-4 transition-all duration-500 group text-muted hover:bg-primary/10">
     <i [class]="icon + ' text-xl transition-colors'"></i>
     <span class="font-bold tracking-tight">{{ label }}</span>
-    <div
-      routerLinkActive="opacity-100"
-      class="absolute right-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-lg bg-secondary opacity-0 transition-opacity duration-500"></div>
+    <div routerLinkActive="opacity-100"
+         class="absolute right-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-lg bg-secondary opacity-0 transition-opacity duration-500">
+    </div>
   </a>
 } @else {
-  <a
-    [routerLink]="routerLink"
-    routerLinkActive="text-secondary bg-primary/15"
-    [routerLinkActiveOptions]="{ exact: true }"
-    class="flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-muted transition-colors hover:bg-primary/10">
+  <a [routerLink]="routerLink"
+     routerLinkActive="text-secondary bg-primary/15"
+     [routerLinkActiveOptions]="{ exact: true }"
+     class="flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-muted transition-colors hover:bg-primary/10">
     <i [class]="icon + ' text-xl'"></i>
-    <span
-      class="max-w-full truncate text-center text-[11px] font-bold leading-tight tracking-tight"
-      >{{ label }}</span
-    >
+    <span class="max-w-full truncate text-center text-[11px] font-bold leading-tight tracking-tight">{{ label }}</span>
   </a>
 }

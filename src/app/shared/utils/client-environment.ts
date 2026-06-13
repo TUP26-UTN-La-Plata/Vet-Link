@@ -1,3 +1,4 @@
+/** Parsed client info for display (User-Agent + Client Hints when available). */
 export interface ClientEnvironment {
   browser: string;
   os: string;
@@ -82,6 +83,7 @@ function readUserAgentData(nav: Navigator): NavigatorUADataBrands | undefined {
   return d;
 }
 
+/** Call from the browser only (e.g. afterNextRender). */
 export function getClientEnvironment(): ClientEnvironment {
   const ua = navigator.userAgent;
   const hints = readUserAgentData(navigator);

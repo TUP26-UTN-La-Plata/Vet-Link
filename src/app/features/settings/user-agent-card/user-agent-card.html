@@ -1,46 +1,48 @@
-<ng-container *transloco="let g">
-  <ng-container *transloco="let t; prefix: 'settings.user-agent-card'">
-    <div class="flex h-full min-h-0 w-full flex-col rounded-xl bg-card p-6 shadow-md">
-      <div class="flex flex-row justify-between items-center gap-4 border-b border-neutral/20 pb-5">
-        <img src="/logo.png" alt="{{g('common.altLogo')}}" class="h-14 w-14 shrink-0 rounded-lg object-contain" />
-        <div class="flex min-w-0 flex-col">
-          <div class="flex flex-row items-center justify-between gap-4">
-            <span class="shrink-0 text-sm text-muted">{{ t('version') }}</span>
-            <span class="rounded-md bg-main px-3 py-1 text-sm font-medium tabular-nums text-base-content">
-              {{ appVersion }}
-            </span>
-          </div>
-
-          <div class="flex flex-row items-center justify-around gap-4">
-            <span class="shrink-0 text-sm text-muted">{{ t('server') }}</span>
-            <span class="flex items-center gap-1.5 text-sm font-medium text-primary">
-              <span class="inline-block h-2 w-2 rounded-full bg-primary" aria-hidden="true"></span>
-              {{ t('online') }}
-            </span>
-          </div>
-
-        </div>
+<div class="flex h-full min-h-0 w-full flex-col rounded-xl bg-card p-6 shadow-md">
+  <div class="flex flex-row justify-between items-center gap-4 border-b border-neutral/20 pb-5">
+    <img
+      src="/logo.png"
+      alt="Vet-Link"
+      class="h-14 w-14 shrink-0 rounded-lg object-contain"
+    />
+    <div class="flex min-w-0 flex-col">
+      <div class="flex flex-row items-center justify-between gap-4">
+        <span class="shrink-0 text-sm text-muted">Versión</span>
+        <span
+          class="rounded-md bg-main px-3 py-1 text-sm font-medium tabular-nums text-base-content"
+        >
+          {{ appVersion }}
+        </span>
       </div>
 
-      <div class="mt-5 flex flex-col gap-4">
-        <div class="flex flex-col gap-3 ">
-          <h3 class="text-base font-semibold text-base-content">{{ t('title') }}</h3>
-          <div class="flex flex-col gap-3 rounded-lg bg-main p-4">
-            <div class="flex flex-row items-start justify-between gap-4">
-              <span class="shrink-0 text-sm text-muted">{{ t('browser') }}</span>
-              <span class="text-right text-sm font-medium text-base-content">{{ browser() }}</span>
-            </div>
-            <div class="flex flex-row items-start justify-between gap-4">
-              <span class="shrink-0 text-sm text-muted">{{ t('os') }}</span>
-              <span class="text-right text-sm font-medium text-base-content">{{ os() }}</span>
-            </div>
-            <div class="flex flex-row items-start justify-between gap-4">
-              <span class="shrink-0 text-sm text-muted">{{ t('device') }}</span>
-              <span class="text-right text-sm font-medium text-base-content">{{ device() }}</span>
-            </div>
-          </div>
+      <div class="flex flex-row items-center justify-around gap-4">
+        <span class="shrink-0 text-sm text-muted">Servidor</span>
+        <span class="flex items-center gap-1.5 text-sm font-medium text-primary">
+          <span class="inline-block h-2 w-2 rounded-full bg-primary" aria-hidden="true"></span>
+          En línea
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mt-5 flex flex-col gap-4">
+    <div class="flex flex-col gap-3 ">
+      <h3 class="text-base font-semibold text-base-content">Entorno del navegador</h3>
+      <div class="flex flex-col gap-3 rounded-lg bg-main p-4">
+        <div class="flex flex-row items-start justify-between gap-4">
+          <span class="shrink-0 text-sm text-muted">Navegador</span>
+          <span class="text-right text-sm font-medium text-base-content">{{ browser() }}</span>
+        </div>
+        <div class="flex flex-row items-start justify-between gap-4">
+          <span class="shrink-0 text-sm text-muted">Sistema operativo</span>
+          <span class="text-right text-sm font-medium text-base-content">{{ os() }}</span>
+        </div>
+        <div class="flex flex-row items-start justify-between gap-4">
+          <span class="shrink-0 text-sm text-muted">Dispositivo</span>
+          <span class="text-right text-sm font-medium text-base-content">{{ device() }}</span>
         </div>
       </div>
     </div>
-  </ng-container>
-</ng-container>
+  </div>
+</div>

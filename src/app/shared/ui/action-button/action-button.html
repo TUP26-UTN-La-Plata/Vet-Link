@@ -2,7 +2,8 @@
   type="button"
   [disabled]="disabled"
   [class]="baseClasses + ' ' + variantClasses[variant]"
-  (click)="onClick()">
+  (click)="onClick()"
+>
   @if (icon) {
     <i [class]="iconClasses(icon)"></i>
   }
