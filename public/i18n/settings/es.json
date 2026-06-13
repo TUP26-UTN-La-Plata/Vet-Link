@@ -23,6 +23,7 @@
   "profile-card": {
     "editButton": "Editar perfil",
     "user": "Usuario",
-    "connectedUser": "Usuario conectado"
+    "connectedUser": "Usuario conectado",
+    "altAvatar": "Avatar"
   }
 }

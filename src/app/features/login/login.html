@@ -2,13 +2,11 @@
   <ng-container *transloco="let t; prefix: 'login'">
     <div class="login-container">
       <div class="login-card">
-        <!-- Logo/Icono de la aplicación -->
         <div class="logo-section">
           <img src="logo_vetlink.png" [alt]="g('common.altLogo')" class="logo-image" />
           <p class="logo-subtitle">{{ t('title') }}</p>
         </div>
 
-        <!-- Botón de Google Login -->
         <button class="google-login-button" (click)="loginWithGoogle()" [disabled]="isLoading()">
           @if (!isLoading()) {
             <span class="google-button-content">
@@ -30,7 +28,6 @@
             </span>
           }
 
-          <!-- Spinner de carga -->
           @if (isLoading()) {
             <span class="spinner-container">
               <span class="spinner"></span>
@@ -38,11 +35,10 @@
           }
         </button>
 
-        <!-- Pie de página -->
         <p class="login-footer">
           {{ t('description') }}
         </p>
       </div>
-    </div></ng-container
-  ></ng-container
+    </div>
+  </ng-container></ng-container
 >
