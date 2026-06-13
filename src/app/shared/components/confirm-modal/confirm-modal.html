@@ -1,25 +1,19 @@
 @if (visible) {
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-4"
-    aria-live="polite"
-  >
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4" aria-live="polite">
     <div
       class="absolute inset-0 cursor-default bg-black/40 backdrop-blur-sm"
       aria-hidden="true"
-      (click)="onBackdropClick()"
-    ></div>
+      (click)="onBackdropClick()"></div>
     <div
       role="dialog"
       aria-modal="true"
       [attr.aria-labelledby]="titleId"
       [attr.aria-describedby]="messageId"
-      class="relative z-10 flex w-full max-w-md flex-col gap-6 rounded-xl bg-card p-6 shadow-lg"
-    >
+      class="relative z-10 flex w-full max-w-md flex-col gap-6 rounded-xl bg-card p-6 shadow-lg">
       <div class="flex flex-col gap-4">
         <div
           class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-danger/15 text-danger"
-          aria-hidden="true"
-        >
+          aria-hidden="true">
           <i [class]="iconClass + ' text-xl leading-none'"></i>
         </div>
         <div class="flex min-w-0 flex-col gap-2">
@@ -32,11 +26,7 @@
         </div>
       </div>
       <div class="flex shrink-0 flex-wrap justify-end gap-3">
-        <app-action-button
-          [label]="cancelLabel"
-          variant="gray"
-          (clicked)="onCancel()"
-        />
+        <app-action-button [label]="cancelLabel" variant="gray" (clicked)="onCancel()" />
         <app-action-button [label]="confirmLabel" variant="danger" (clicked)="onConfirm()" />
       </div>
     </div>
