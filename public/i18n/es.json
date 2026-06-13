@@ -1,104 +1,80 @@
 {
-    "primeng": {
-        "startsWith": "Comienza con",
-        "contains": "Contiene",
-        "notContains": "No contiene",
-        "endsWith": "Termina con",
-        "equals": "Igual a",
-        "notEquals": "Diferente a",
-        "noFilter": "Sin filtro",
-        "lt": "Menor que",
-        "lte": "Menor o igual a",
-        "gt": "Mayor que",
-        "gte": "Mayor o igual a",
-        "dateIs": "Fecha es",
-        "dateIsNot": "Fecha no es",
-        "dateBefore": "Fecha es antes",
-        "dateAfter": "Fecha es después",
-        "clear": "Limpiar",
-        "apply": "Aplicar",
-        "matchAll": "Coincidir con todos",
-        "matchAny": "Coincidir con cualquiera",
-        "addRule": "Agregar regla",
-        "removeRule": "Eliminar regla",
-        "accept": "Sí",
-        "reject": "No",
-        "choose": "Elegir",
-        "upload": "Subir",
-        "cancel": "Cancelar",
-        "dayNames": [
-            "Domingo",
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes",
-            "Sábado"
-        ],
-        "dayNamesShort": [
-            "Dom",
-            "Lun",
-            "Mar",
-            "Mié",
-            "Jue",
-            "Vie",
-            "Sáb"
-        ],
-        "dayNamesMin": [
-            "Do",
-            "Lu",
-            "Ma",
-            "Mi",
-            "Ju",
-            "Vi",
-            "Sa"
-        ],
-        "monthNames": [
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-            "Septiembre",
-            "Octubre",
-            "Noviembre",
-            "Diciembre"
-        ],
-        "monthNamesShort": [
-            "Ene",
-            "Feb",
-            "Mar",
-            "Abr",
-            "May",
-            "Jun",
-            "Jul",
-            "Ago",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dic"
-        ],
-        "emptyMessage": "No se encontraron resultados",
-        "emptyFilterMessage": "No se encontraron opciones disponibles"
-    },
-    "pageTitle": {
-        "login": "Vet-Link - Inicio de Sesión",
-        "patients": "Vet-Link - Gestión de Pacientes",
-        "settings": "Vet-Link - Configuración"
-    },
-    "common": {
-        "altLogo": "Logo Vet-Link",
-        "altAvatar": "Avatar"
-    },
-    "layout": {
-        "version": "Versión 0.1.1",
-        "header": {},
-        "nav": {
-            "patients": "Pacientes",
-            "settings": "Configuración"
-        }
+  "primeng": {
+    "startsWith": "Comienza con",
+    "contains": "Contiene",
+    "notContains": "No contiene",
+    "endsWith": "Termina con",
+    "equals": "Igual a",
+    "notEquals": "Diferente a",
+    "noFilter": "Sin filtro",
+    "lt": "Menor que",
+    "lte": "Menor o igual a",
+    "gt": "Mayor que",
+    "gte": "Mayor o igual a",
+    "dateIs": "Fecha es",
+    "dateIsNot": "Fecha no es",
+    "dateBefore": "Fecha es antes",
+    "dateAfter": "Fecha es después",
+    "clear": "Limpiar",
+    "apply": "Aplicar",
+    "matchAll": "Coincidir con todos",
+    "matchAny": "Coincidir con cualquiera",
+    "addRule": "Agregar regla",
+    "removeRule": "Eliminar regla",
+    "accept": "Sí",
+    "reject": "No",
+    "choose": "Elegir",
+    "upload": "Subir",
+    "cancel": "Cancelar",
+    "dayNames": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+    "dayNamesShort": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    "dayNamesMin": ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+    "monthNames": [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    "monthNamesShort": [
+      "Ene",
+      "Feb",
+      "Mar",
+      "Abr",
+      "May",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dic"
+    ],
+    "emptyMessage": "No se encontraron resultados",
+    "emptyFilterMessage": "No se encontraron opciones disponibles"
+  },
+  "pageTitle": {
+    "login": "Vet-Link - Inicio de Sesión",
+    "patients": "Vet-Link - Gestión de Pacientes",
+    "settings": "Vet-Link - Configuración"
+  },
+  "common": {
+    "altLogo": "Logo Vet-Link",
+    "altAvatar": "Avatar"
+  },
+  "layout": {
+    "version": "Versión",
+    "header": {},
+    "nav": {
+      "patients": "Pacientes",
+      "settings": "Configuración"
     }
+  }
 }
