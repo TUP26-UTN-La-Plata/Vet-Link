@@ -2,13 +2,21 @@
   <aside
     class="hidden h-full min-h-0 w-48 shrink-0 flex-col items-start justify-between border-r-2 border-neutral/20 bg-main md:flex">
     <div class="flex w-full items-center justify-center">
-      <img src="/logo.png" alt="{{g('common.altLogo')}}" class="max-h-32 max-w-32" />
+      <img src="/logo.png" alt="{{ g('common.altLogo') }}" class="max-h-32 max-w-32" />
     </div>
     <div class="my-4 flex h-full w-full flex-col items-start justify-start pr-2">
-      <app-nav-button [label]="g('layout.nav.patients')" [icon]="'pi pi-heart'" [routerLink]="'/patients'" />
-      <app-nav-button [label]="g('layout.nav.settings')" [icon]="'pi pi-cog'" [routerLink]="'/settings'" />
+      <app-nav-button
+        [label]="g('layout.nav.patients')"
+        [icon]="'pi pi-heart'"
+        [routerLink]="'/patients'" />
+      <app-nav-button
+        [label]="g('layout.nav.settings')"
+        [icon]="'pi pi-cog'"
+        [routerLink]="'/settings'" />
     </div>
-    <p class="h-8 w-full px-4 text-end text-sm text-muted">{{g('layout.version')}}</p>
+    <p class="h-8 w-full px-4 text-end text-sm text-muted">
+      {{ g('layout.version') }} - {{ appVersion }}
+    </p>
   </aside>
 
   <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-card">
@@ -24,13 +32,20 @@
       <div class="relative h-16">
         <p
           class="pointer-events-none absolute right-1 -top-2 z-30 -translate-y-1/2 text-[11px] leading-none text-muted">
-          {{g('layout.version')}}
+          {{ g('layout.version') }} - {{ appVersion }}
         </p>
-        <nav class="layout-bottom-nav relative z-10 flex h-full shrink-0 items-stretch gap-0"
+        <nav
+          class="layout-bottom-nav relative z-10 flex h-full shrink-0 items-stretch gap-0"
           aria-label="Navegación principal">
-          <app-nav-button variant="bottom" [label]="g('layout.nav.patients')" [icon]="'pi pi-heart'"
+          <app-nav-button
+            variant="bottom"
+            [label]="g('layout.nav.patients')"
+            [icon]="'pi pi-heart'"
             [routerLink]="'/patients'" />
-          <app-nav-button variant="bottom" [label]="g('layout.nav.settings')" [icon]="'pi pi-cog'"
+          <app-nav-button
+            variant="bottom"
+            [label]="g('layout.nav.settings')"
+            [icon]="'pi pi-cog'"
             [routerLink]="'/settings'" />
         </nav>
       </div>

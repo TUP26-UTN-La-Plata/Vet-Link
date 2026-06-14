@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { NavButton } from './nav-button/nav-button';
 import { LayoutHeader } from './layout-header/layout-header';
 import { TranslocoModule } from '@jsverse/transloco';
+import { APP_VERSION } from '../utils/app-version';
 
 @Component({
   standalone: true,
@@ -11,4 +12,6 @@ import { TranslocoModule } from '@jsverse/transloco';
   templateUrl: './layout.html',
   styleUrl: './layout.css',
 })
-export class Layout { }
+export class Layout {
+  readonly appVersion = APP_VERSION;
+}
