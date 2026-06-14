@@ -2,7 +2,7 @@
   <div class="login-card">
     <!-- Logo/Icono de la aplicación -->
     <div class="logo-section">
-      <img src="logo_vetlink.png" alt="Logo Vet-Link" class="logo-image">
+      <img src="logo_vetlink.png" alt="Logo Vet-Link" class="logo-image" />
       <p class="logo-subtitle">Sistema de Gestión Veterinaria</p>
     </div>
 
@@ -14,9 +14,7 @@
       [class.loading]="isLoading()"
     >
       <!-- Contenido normal -->
-      <span *ngIf="!isLoading()" class="button-text">
-        Iniciar sesión
-      </span>
+      <span *ngIf="!isLoading()" class="button-text"> Iniciar sesión </span>
 
       <!-- Spinner de carga -->
       <span *ngIf="isLoading()" class="spinner-container">
@@ -26,9 +24,6 @@
     </button>
 
     <!-- Pie de página -->
-    <p class="login-footer">
-      Bienvenido a Vet-Link
-    </p>
+    <p class="login-footer">Bienvenido a Vet-Link</p>
   </div>
 </div>
-
