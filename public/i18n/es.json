@@ -76,5 +76,13 @@
       "patients": "Pacientes",
       "settings": "Configuración"
     }
+  },
+  "online": {
+    "summary": "Conexión restablecida",
+    "detail": "Volviste a estar online. Actualice la página para continuar."
+  },
+  "offline": {
+    "summary": "Modo sin conexión",
+    "detail": "La autenticación y funciones en la nube no estarán disponibles."
   }
 }
