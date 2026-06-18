@@ -1,0 +1,22 @@
+{
+  "name": "Vet-Link",
+  "short_name": "Vet-Link",
+  "icons": [
+    {
+      "src": "/favicons/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicons/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#f8fafc",
+  "background_color": "#3cb9b3",
+  "display": "standalone",
+  "scope": "/"
+}
