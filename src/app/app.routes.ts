@@ -28,6 +28,12 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'propietarios',
+        title: 'pageTitle.owners',
+        loadComponent: () =>
+          import('./features/propietarios/propietarios').then((m) => m.Propietarios),
+      },
+      {
         path: 'settings',
         title: 'pageTitle.settings',
         loadComponent: () => import('./features/settings/settings').then((m) => m.Settings),
