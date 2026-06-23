@@ -6,8 +6,8 @@ import { Owner, RandomUserApiResponse, RandomUserResult } from './owners.interfa
 @Injectable({
   providedIn: 'root',
 })
-export class ownersService {
-  readonly #API_URL = 'https://randomuser.me/api/?results=12&nat=es,us,fr,mx,ar';
+export class OwnersService {
+  readonly #API_URL = 'https://randomuser.me/api/?results=15&nat=es,us,mx,ar,fr';
   readonly #http = inject(HttpClient);
 
   getOwners(): Observable<Owner[]> {

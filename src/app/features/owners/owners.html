@@ -22,19 +22,19 @@
   </div>
 
   <div class="mt-6">
-    @if (loading) {
+    @if (loading()) {
       <div class="flex flex-col items-center justify-center py-20">
         <p-progressSpinner class="w-12 h-12" strokeWidth="4"></p-progressSpinner>
         <span class="mt-4 text-sm text-muted">Cargando propietarios...</span>
       </div>
     } @else {
-      @if (errorMessage) {
+      @if (errorMessage()) {
         <div class="mb-6 rounded-3xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
-          {{ errorMessage }}
+          {{ errorMessage() }}
         </div>
       }
 
-      @if (!errorMessage && filteredOwners.length === 0) {
+      @if (!errorMessage() && filteredOwners().length === 0) {
         <div
           class="rounded-3xl border-2 border-dashed border-neutral/10 bg-card p-12 text-center text-neutral">
           <i class="pi pi-filter-slash text-4xl text-neutral/20 mb-4"></i>
@@ -42,9 +42,9 @@
         </div>
       }
 
-      @if (filteredOwners.length > 0) {
+      @if (filteredOwners().length > 0) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          @for (owner of filteredOwners; track owner.id) {
+          @for (owner of filteredOwners(); track owner.id) {
             <div class="group">
               <p-card
                 class="owner-card h-full overflow-hidden rounded-3xl border-2 border-neutral/10 bg-card shadow-none transition-all duration-300 hover:border-neutral/30 hover:shadow-xl">

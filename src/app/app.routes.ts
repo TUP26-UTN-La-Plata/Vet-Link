@@ -30,7 +30,7 @@ export const routes: Routes = [
       {
         path: 'owners',
         title: 'pageTitle.owners',
-        loadComponent: () => import('./features/owners/owners').then((m) => m.owners),
+        loadComponent: () => import('./features/owners/owners').then((m) => m.OwnersComponent),
       },
       {
         path: 'settings',

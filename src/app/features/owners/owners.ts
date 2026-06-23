@@ -1,12 +1,11 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { ownersService } from './owners.service';
+import { OwnersStateService } from './owners-state.service';
 import { Owner } from './owners.interface';
 
 @Component({
@@ -22,64 +21,25 @@ import { Owner } from './owners.interface';
   ],
   templateUrl: './owners.html',
   styleUrl: './owners.css',
-  providers: [ownersService],
 })
-export class owners implements OnInit {
-  owners: Owner[] = [];
-  filteredOwners: Owner[] = [];
-  loading = false;
-  errorMessage: string | null = null;
+export class OwnersComponent implements OnInit {
+  readonly ownersState = inject(OwnersStateService);
 
-  readonly #ownersService = inject(ownersService);
-  readonly #cd = inject(ChangeDetectorRef);
-  readonly #destroyRef = inject(DestroyRef);
+  readonly owners = this.ownersState.owners;
+  readonly filteredOwners = this.ownersState.filteredOwners;
+  readonly loading = this.ownersState.loading;
+  readonly errorMessage = this.ownersState.errorMessage;
 
   ngOnInit(): void {
-    this.loadOwners();
-  }
-
-  loadOwners(): void {
-    this.loading = true;
-    this.errorMessage = null;
-
-    this.#ownersService
-      .getOwners()
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe({
-        next: (owners) => {
-          this.owners = owners;
-          this.filteredOwners = [...owners];
-          this.loading = false;
-          this.#cd.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error al cargar propietarios:', error);
-          this.errorMessage =
-            'Lo sentimos, no pudimos cargar la lista de propietarios. Por favor, intenta nuevamente.';
-          this.loading = false;
-          this.#cd.detectChanges();
-        },
-      });
+    this.ownersState.loadOwners();
   }
 
   filterOwners(event: Event): void {
-    const searchText = (event.target as HTMLInputElement).value.toLowerCase().trim();
-
-    if (!searchText) {
-      this.filteredOwners = [...this.owners];
-      return;
-    }
-
-    this.filteredOwners = this.owners.filter((owner) => {
-      return (
-        owner.name.toLowerCase().includes(searchText) ||
-        owner.email.toLowerCase().includes(searchText) ||
-        owner.location.toLowerCase().includes(searchText)
-      );
-    });
+    const searchText = (event.target as HTMLInputElement).value;
+    this.ownersState.setSearchTerm(searchText);
   }
 
-  trackByOwner(index: number, owner: Owner): string {
+  trackByOwner(_: number, owner: Owner): string {
     return owner.id;
   }
 }
