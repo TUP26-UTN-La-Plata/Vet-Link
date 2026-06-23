@@ -28,10 +28,9 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'propietarios',
+        path: 'owners',
         title: 'pageTitle.owners',
-        loadComponent: () =>
-          import('./features/propietarios/propietarios').then((m) => m.Propietarios),
+        loadComponent: () => import('./features/owners/owners').then((m) => m.owners),
       },
       {
         path: 'settings',

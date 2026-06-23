@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Owner, RandomUserApiResponse, RandomUserResult } from './propietarios.interface';
+import { Owner, RandomUserApiResponse, RandomUserResult } from './owners.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PropietariosService {
+export class ownersService {
   readonly #API_URL = 'https://randomuser.me/api/?results=12&nat=es,us,fr,mx,ar';
   readonly #http = inject(HttpClient);
 

@@ -6,11 +6,11 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PropietariosService } from './propietarios.service';
-import { Owner } from './propietarios.interface';
+import { ownersService } from './owners.service';
+import { Owner } from './owners.interface';
 
 @Component({
-  selector: 'app-propietarios',
+  selector: 'app-owners',
   standalone: true,
   imports: [
     CommonModule,
@@ -20,17 +20,17 @@ import { Owner } from './propietarios.interface';
     InputTextModule,
     ProgressSpinnerModule,
   ],
-  templateUrl: './propietarios.html',
-  styleUrl: './propietarios.css',
-  providers: [PropietariosService],
+  templateUrl: './owners.html',
+  styleUrl: './owners.css',
+  providers: [ownersService],
 })
-export class Propietarios implements OnInit {
+export class owners implements OnInit {
   owners: Owner[] = [];
   filteredOwners: Owner[] = [];
   loading = false;
   errorMessage: string | null = null;
 
-  readonly #ownersService = inject(PropietariosService);
+  readonly #ownersService = inject(ownersService);
   readonly #cd = inject(ChangeDetectorRef);
   readonly #destroyRef = inject(DestroyRef);
 
