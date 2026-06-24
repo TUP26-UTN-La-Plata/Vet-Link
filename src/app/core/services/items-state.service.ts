@@ -45,6 +45,23 @@ export class PatientsStateService {
     return this.#patientsSubject.value;
   }
 
+  updatePatient(updatedPatient: Patient): void {
+    const currentPatients = this.#patientsSubject.value;
+    const existingPatientIndex = currentPatients.findIndex(
+      (patient) => patient.id === updatedPatient.id
+    );
+
+    const nextPatients =
+      existingPatientIndex >= 0
+        ? currentPatients.map((patient) =>
+            patient.id === updatedPatient.id ? updatedPatient : patient
+          )
+        : [...currentPatients, updatedPatient];
+
+    this.#patientsSubject.next(nextPatients);
+    this.#localStorageService.save(this.#CACHE_KEY, nextPatients, this.#CACHE_TTL);
+  }
+
   /* Limpia el caché y el estado actual de pacientes.
    */
   clearCache(): void {

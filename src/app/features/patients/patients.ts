@@ -1,6 +1,7 @@
 import { Component, ChangeDetectorRef, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Patient, PatientsPaginatorPt, SortCascadeOption } from './patients.interface';
 import { PatientsService } from './patients.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -19,6 +20,7 @@ import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsver
   selector: 'app-patients',
   imports: [
     FormsModule,
+    RouterLink,
     ProgressSpinnerModule,
     MessageModule,
     CardModule,

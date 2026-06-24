@@ -42,6 +42,13 @@ export interface Patient {
   averageWeight: number;
   averageHeight: number;
   origin: string;
+  breed?: string;
+  age?: number;
+  ownerName?: string;
+  ownerEmail?: string;
+  ownerPhone?: string;
+  temperament?: string;
+  notes?: string;
 }
 
 interface SortCascadeValue {
