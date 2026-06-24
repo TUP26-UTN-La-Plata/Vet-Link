@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { take } from 'rxjs';
 import { LocalStorageService } from '../../core/services/local-storage.service';
+import { TranslocoService } from '@jsverse/transloco';
 import { Owner } from './owners.interface';
 import { OwnersService } from './owners.service';
 
@@ -10,15 +11,20 @@ import { OwnersService } from './owners.service';
 export class OwnersStateService {
   readonly #ownersService = inject(OwnersService);
   readonly #localStorageService = inject(LocalStorageService);
+  readonly #translocoService = inject(TranslocoService);
 
   readonly #owners = signal<Owner[]>([]);
   readonly #loading = signal(false);
-  readonly #errorMessage = signal<string | null>(null);
+  readonly #errorKey = signal<string | null>(null);
   readonly #searchTerm = signal('');
 
   readonly owners = this.#owners.asReadonly();
   readonly loading = this.#loading.asReadonly();
-  readonly errorMessage = this.#errorMessage.asReadonly();
+  readonly errorMessage = computed(() => {
+    const key = this.#errorKey();
+    if (!key) return null;
+    return this.#translocoService.translate(key);
+  });
   readonly searchTerm = this.#searchTerm.asReadonly();
 
   readonly filteredOwners = computed(() => {
@@ -47,12 +53,12 @@ export class OwnersStateService {
 
     if (cachedOwners?.length) {
       this.#owners.set(cachedOwners);
-      this.#errorMessage.set(null);
+      this.#errorKey.set(null);
       return;
     }
 
     this.#loading.set(true);
-    this.#errorMessage.set(null);
+    this.#errorKey.set(null);
 
     this.#ownersService
       .getOwners()
@@ -64,10 +70,8 @@ export class OwnersStateService {
           this.#loading.set(false);
         },
         error: (error) => {
-          console.error('Error al cargar propietarios:', error);
-          this.#errorMessage.set(
-            'Lo sentimos, no pudimos cargar la lista de propietarios. Por favor, intenta nuevamente.'
-          );
+          console.error(this.#translocoService.translate('owners.errors.loadFail'), error);
+          this.#errorKey.set('owners.errors.loadFail');
           this.#loading.set(false);
         },
       });

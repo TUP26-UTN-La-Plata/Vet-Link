@@ -30,7 +30,6 @@ export class OwnersService {
       city: owner.location.city,
       country: owner.location.country,
       picture,
-      description: `Propietario de ${owner.location.city} (${owner.location.country}) con historial de contacto confiable.`,
     };
   }
 }

@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { OwnersStateService } from './owners-state.service';
 import { Owner } from './owners.interface';
+import { TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-owners',
@@ -18,7 +19,9 @@ import { Owner } from './owners.interface';
     CardModule,
     InputTextModule,
     ProgressSpinnerModule,
+    TranslocoModule,
   ],
+  providers: [[provideTranslocoScope('owners')]],
   templateUrl: './owners.html',
   styleUrl: './owners.css',
 })

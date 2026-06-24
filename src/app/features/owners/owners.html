@@ -1,98 +1,101 @@
-<div class="flex flex-col">
-  <div class="sticky top-0 z-10 bg-main pb-6 pt-6">
-    <div class="flex flex-col gap-1">
-      <h1 class="text-2xl font-bold text-neutral">Gestión de Propietarios</h1>
-      <p class="text-sm text-muted">Consulta y filtra la lista de propietarios.</p>
-    </div>
-
-    <div class="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div class="flex-1 min-w-0">
-        <input
-          pInputText
-          type="text"
-          class="w-full py-2.5 bg-card border-3 border-neutral/20 rounded-xl focus:ring-2 focus:ring-neutral/10 transition-all shadow-sm"
-          placeholder="Buscar propietario..."
-          (input)="filterOwners($event)" />
+<ng-container *transloco="let t; prefix: 'owners'">
+  <div class="flex flex-col">
+    <div class="sticky top-[-1.5rem] z-10 pt-6 pb-4 bg-main">
+      <div class="flex flex-col gap-1">
+        <h1 class="text-2xl font-bold text-neutral">{{ t('title') }}</h1>
+        <p class="text-sm text-muted">{{ t('description') }}</p>
       </div>
 
-      <button pButton type="button" class="w-full md:w-auto rounded-xl px-6 py-3 text-sm font-bold">
-        Agregar
-      </button>
+      <div class="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex-1 min-w-0">
+          <input
+            pInputText
+            type="text"
+            class="w-full py-2.5 bg-card border-3 border-neutral/20 rounded-xl focus:ring-2 focus:ring-neutral/10 transition-all shadow-sm"
+            placeholder="{{ t('placeholderSearch') }}"
+            (input)="filterOwners($event)" />
+        </div>
+
+        <button
+          pButton
+          type="button"
+          class="w-full md:w-auto rounded-xl px-6 py-3 text-sm font-bold">
+          {{ t('addOwner') }}
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      @if (loading()) {
+        <div class="flex flex-col items-center justify-center py-20">
+          <p-progressSpinner class="w-12 h-12" strokeWidth="4"></p-progressSpinner>
+          <span class="mt-4 text-sm text-muted">{{ t('loadingText') }}</span>
+        </div>
+      } @else {
+        @if (errorMessage()) {
+          <div class="mb-6 rounded-3xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        @if (!errorMessage() && filteredOwners().length === 0) {
+          <div
+            class="rounded-3xl border-2 border-dashed border-neutral/10 bg-card p-12 text-center text-neutral">
+            <i class="pi pi-filter-slash text-4xl text-neutral/20 mb-4"></i>
+            <p class="text-sm text-muted">{{ t('emptyText') }}</p>
+          </div>
+        }
+
+        @if (filteredOwners().length > 0) {
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            @for (owner of filteredOwners(); track owner.id) {
+              <div class="group">
+                <p-card
+                  class="owner-card h-full overflow-hidden rounded-3xl border-2 border-neutral/10 bg-card shadow-none transition-all duration-300 hover:border-neutral/30 hover:shadow-xl">
+                  <div class="overflow-hidden">
+                    <img
+                      [src]="owner.picture"
+                      [alt]="owner.name"
+                      class="owner-avatar h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onerror="this.src = '/no-image.webp'" />
+                  </div>
+                  <div class="p-5">
+                    <div class="mb-4">
+                      <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">{{
+                        t('card.owner')
+                      }}</span>
+                      <h2 class="mt-3 text-xl font-bold text-neutral leading-tight">
+                        {{ owner.name }}
+                      </h2>
+                    </div>
+
+                    <div class="grid gap-3 text-sm text-neutral">
+                      <div class="rounded-3xl bg-surface p-4 border border-neutral/10">
+                        <span class="block text-[10px] uppercase tracking-[0.2em] text-muted">{{
+                          t('card.email')
+                        }}</span>
+                        <span class="mt-1 block font-medium break-words">{{ owner.email }}</span>
+                      </div>
+                      <div class="rounded-3xl bg-surface p-4 border border-neutral/10">
+                        <span class="block text-[10px] uppercase tracking-[0.2em] text-muted">{{
+                          t('card.phone')
+                        }}</span>
+                        <span class="mt-1 block font-medium">{{ owner.phone }}</span>
+                      </div>
+                      <div class="rounded-3xl bg-surface p-4 border border-neutral/10">
+                        <span class="block text-[10px] uppercase tracking-[0.2em] text-muted">{{
+                          t('card.location')
+                        }}</span>
+                        <span class="mt-1 block font-medium">{{ owner.location }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </p-card>
+              </div>
+            }
+          </div>
+        }
+      }
     </div>
   </div>
-
-  <div class="mt-6">
-    @if (loading()) {
-      <div class="flex flex-col items-center justify-center py-20">
-        <p-progressSpinner class="w-12 h-12" strokeWidth="4"></p-progressSpinner>
-        <span class="mt-4 text-sm text-muted">Cargando propietarios...</span>
-      </div>
-    } @else {
-      @if (errorMessage()) {
-        <div class="mb-6 rounded-3xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
-          {{ errorMessage() }}
-        </div>
-      }
-
-      @if (!errorMessage() && filteredOwners().length === 0) {
-        <div
-          class="rounded-3xl border-2 border-dashed border-neutral/10 bg-card p-12 text-center text-neutral">
-          <i class="pi pi-filter-slash text-4xl text-neutral/20 mb-4"></i>
-          <p class="text-sm text-muted">No se encontró ningún propietario con esa búsqueda.</p>
-        </div>
-      }
-
-      @if (filteredOwners().length > 0) {
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          @for (owner of filteredOwners(); track owner.id) {
-            <div class="group">
-              <p-card
-                class="owner-card h-full overflow-hidden rounded-3xl border-2 border-neutral/10 bg-card shadow-none transition-all duration-300 hover:border-neutral/30 hover:shadow-xl">
-                <div class="overflow-hidden">
-                  <img
-                    [src]="owner.picture"
-                    [alt]="owner.name"
-                    class="owner-avatar h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onerror="this.src = '/no-image.webp'" />
-                </div>
-                <div class="p-5">
-                  <div class="mb-4">
-                    <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-muted"
-                      >Propietario</span
-                    >
-                    <h2 class="mt-3 text-xl font-bold text-neutral leading-tight">
-                      {{ owner.name }}
-                    </h2>
-                  </div>
-
-                  <div class="grid gap-3 text-sm text-neutral">
-                    <div class="rounded-3xl bg-surface p-4 border border-neutral/10">
-                      <span class="block text-[10px] uppercase tracking-[0.2em] text-muted"
-                        >Email</span
-                      >
-                      <span class="mt-1 block font-medium break-words">{{ owner.email }}</span>
-                    </div>
-                    <div class="rounded-3xl bg-surface p-4 border border-neutral/10">
-                      <span class="block text-[10px] uppercase tracking-[0.2em] text-muted"
-                        >Teléfono</span
-                      >
-                      <span class="mt-1 block font-medium">{{ owner.phone }}</span>
-                    </div>
-                    <div class="rounded-3xl bg-surface p-4 border border-neutral/10">
-                      <span class="block text-[10px] uppercase tracking-[0.2em] text-muted"
-                        >Ubicación</span
-                      >
-                      <span class="mt-1 block font-medium">{{ owner.location }}</span>
-                    </div>
-                  </div>
-
-                  <p class="mt-4 text-sm text-muted line-clamp-3">{{ owner.description }}</p>
-                </div>
-              </p-card>
-            </div>
-          }
-        </div>
-      }
-    }
-  </div>
-</div>
+</ng-container>

@@ -7,7 +7,6 @@ export interface Owner {
   city: string;
   country: string;
   picture: string;
-  description: string;
 }
 
 export interface RandomUserApiResponse {
