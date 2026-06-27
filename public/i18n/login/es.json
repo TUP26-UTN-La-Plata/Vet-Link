@@ -1,7 +1,7 @@
 {
-    "title": "Sistema de Gestión Veterinaria",
-    "description": "Bienvenido a Vet-Link",
-    "buttonLogin": "Iniciar sesión",
-    "loadingText": "Verificando...",
-    "errorText": "Usuario o contraseña incorrectos"
+  "title": "Sistema de Gestión Veterinaria",
+  "description": "Bienvenido a Vet-Link",
+  "buttonLogin": "Iniciar sesión",
+  "loadingText": "Verificando...",
+  "errorText": "Error al iniciar sesión con Google"
 }
