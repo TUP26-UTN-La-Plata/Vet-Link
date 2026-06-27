@@ -1,7 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Owner, RandomUserApiResponse, RandomUserResult } from './owners.interface';
+import {
+  Owner,
+  RandomUserApiResponse,
+  RandomUserResult,
+} from '../../features/owners/owners.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +21,8 @@ export class OwnersService {
   }
 
   #mapToOwner(owner: RandomUserResult): Owner {
-    const picture = owner.picture.large || owner.picture.medium || '/no-image.webp';
+    const picture =
+      owner.picture.medium || owner.picture.large || owner.picture.thumbnail || '/no-image.webp';
     const name = `${owner.name.first} ${owner.name.last}`;
     const location = `${owner.location.city}, ${owner.location.country}`;
 

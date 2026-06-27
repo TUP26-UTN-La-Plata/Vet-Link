@@ -79,6 +79,23 @@
       "settings": "Configuración"
     }
   },
+  "owners": {
+    "title": "Gestión de Propietarios",
+    "description": "Consulta y filtra la lista de propietarios.",
+    "placeholderSearch": "Buscar propietario...",
+    "addOwner": "Agregar",
+    "loadingText": "Cargando propietarios...",
+    "emptyText": "No se encontró ningún propietario con esa búsqueda.",
+    "errors": {
+      "loadFail": "Lo sentimos, no pudimos cargar la lista de propietarios. Por favor, intenta nuevamente."
+    },
+    "card": {
+      "owner": "Propietario",
+      "email": "Email",
+      "phone": "Teléfono",
+      "location": "Ubicación"
+    }
+  },
   "online": {
     "summary": "Conexión restablecida",
     "detail": "Volviste a estar online. Actualice la página para continuar."
