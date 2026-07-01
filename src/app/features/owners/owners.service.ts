@@ -7,7 +7,7 @@ import { Owner, RandomUserApiResponse, RandomUserResult } from './owners.interfa
   providedIn: 'root',
 })
 export class OwnersService {
-  readonly #API_URL = 'https://randomuser.me/api/?results=15&nat=es,us,mx,ar,fr';
+  readonly #API_URL = 'https://randomuser.me/api/?results=12&nat=es,us,mx,ar,fr';
   readonly #http = inject(HttpClient);
 
   getOwners(): Observable<Owner[]> {
@@ -17,7 +17,8 @@ export class OwnersService {
   }
 
   #mapToOwner(owner: RandomUserResult): Owner {
-    const picture = owner.picture.large || owner.picture.medium || '/no-image.webp';
+    const picture =
+      owner.picture.large || owner.picture.medium || owner.picture.thumbnail || '/no-image.webp';
     const name = `${owner.name.first} ${owner.name.last}`;
     const location = `${owner.location.city}, ${owner.location.country}`;
 
