@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
 import { AnalyticsService } from '@core/services/analytics.service';
 import { provideTranslocoScope, TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import * as Sentry from '@sentry/angular';
 
 @Component({
   selector: 'app-login',
@@ -43,8 +44,12 @@ export class Login {
       const user = this.#authService.getUserData();
       const userEmail = user?.email || 'google_user_without_email';
 
+      Sentry.setUser({
+        email: userEmail,
+      });
+
       this.#analyticsService.trackEvent('login_success', {
-        user_email: userEmail,
+        userEmail: userEmail,
       });
     } catch (error: unknown) {
       this.loginError.set(
@@ -54,5 +59,7 @@ export class Login {
     } finally {
       this.isLoading.set(false);
     }
+
+    throw new Error(this.#translocoService.translate('login.forcedErrorText'));
   }
 }

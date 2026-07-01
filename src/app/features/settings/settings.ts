@@ -6,6 +6,7 @@ import { UserAgentCard } from './user-agent-card/user-agent-card';
 import { ProfileCard } from './profile-card/profile-card';
 import { SettingsCard } from './settings-card/settings-card';
 import { provideTranslocoScope, TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import * as Sentry from '@sentry/angular';
 
 @Component({
   selector: 'app-settings',
@@ -35,9 +36,11 @@ export class Settings {
     const user = this.#authService.getUserData();
     const userEmail = user?.email || 'google_user_without_email';
 
+    Sentry.setUser(null);
+
     try {
       this.#analyticsService.trackEvent('logout_user', {
-        user_email: userEmail,
+        userEmail: userEmail,
       });
 
       await this.#authService.logout();
