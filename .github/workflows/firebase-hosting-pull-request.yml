@@ -31,4 +31,4 @@ jobs:
 
       - name: Run Lighthouse CI on Firebase Preview URL
         run: |
-          npx @lhci/cli@0.15.x autorun --url=${{ steps.firebase_preview.outputs.details_url }
+          npx @lhci/cli@0.15.x autorun --url=${{ steps.firebase_preview.outputs.details_url }}
