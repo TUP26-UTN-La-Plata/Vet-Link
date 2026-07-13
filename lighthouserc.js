@@ -2,7 +2,7 @@ module.exports = {
   ci: {
     collect: {
       numberOfRuns: 1,
-      staticDistDir: './dist/Vet-Link',
+      url: process.env.LIGHTHOUSE_URL || 'http://localhost:3000',
     },
     upload: {
       target: 'temporary-public-storage',
