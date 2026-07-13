@@ -9,10 +9,10 @@ permissions:
   pull-requests: write
 jobs:
   build_and_preview:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}[cite: 2]
-    runs-on: ubuntu-latest[cite: 2]
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4[cite: 2]
+      - uses: actions/checkout@v4
       
       - name: Use Node.js 18.x
         uses: actions/setup-node@v3
@@ -20,15 +20,15 @@ jobs:
           node-version: 18.x
           cache: 'npm'
 
-      - run: npm ci && npm run build[cite: 2]
+      - run: npm ci && npm run build
 
-      - uses: FirebaseExtended/action-hosting-deploy@v0[cite: 2]
+      - uses: FirebaseExtended/action-hosting-deploy@v0
         id: firebase_preview
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}[cite: 2]
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_VET_LINK_859A3 }}[cite: 2]
-          projectId: vet-link-859a3[cite: 2]
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_VET_LINK_859A3 }}
+          projectId: vet-link-859a3
 
       - name: Run Lighthouse CI on Firebase Preview URL
         run: |
-          npx @lhci/cli@0.15.x autorun --url=${{ steps.firebase_preview.outputs.details_url }}
+          npx @lhci/cli@0.15.x autorun --url=${{ steps.firebase_preview.outputs.details_url }
