@@ -48,3 +48,6 @@ Thumbs.db
 
 # Lighthouse CI
 .lighthouseci
+
+# esbuild-visualizer
+/report.html

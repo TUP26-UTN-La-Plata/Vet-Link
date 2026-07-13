@@ -11,7 +11,8 @@
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"src/**/*.{html,ts,scss,css,json}\"",
     "prepare": "husky",
-    "lhci": "lhci autorun"
+    "lhci": "lhci autorun",
+    "analyze": "esbuild-visualizer --metadata dist/Vet-Link/stats.json --filename report.html --open"
   },
   "lint-staged": {
     "*.{ts,html}": [
@@ -51,6 +52,7 @@
     "@tailwindcss/postcss": "^4.1.12",
     "angular-eslint": "21.4.0",
     "autoprefixer": "^10.5.0",
+    "esbuild-visualizer": "^0.7.0",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.6.0",
