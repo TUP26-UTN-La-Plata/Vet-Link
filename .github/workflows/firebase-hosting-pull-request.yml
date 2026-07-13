@@ -32,4 +32,5 @@ jobs:
       - name: Run Lighthouse CI on Firebase Preview URL
         env:
           LIGHTHOUSE_URL: ${{ steps.firebase_preview.outputs.details_url }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run lhci
