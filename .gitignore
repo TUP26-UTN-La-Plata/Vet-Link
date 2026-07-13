@@ -45,3 +45,6 @@ Thumbs.db
 
 # Firebase
 .firebase
+
+# Lighthouse CI
+.lighthouseci
