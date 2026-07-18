@@ -12,7 +12,7 @@
     "format": "prettier --write \"src/**/*.{html,ts,scss,css,json}\"",
     "prepare": "husky",
     "lhci": "lhci autorun",
-    "analyze": "esbuild-visualizer --metadata dist/Vet-Link/stats.json --filename report.html --open"
+    "analyze": "npm run build && esbuild-visualizer --metadata dist/Vet-Link/stats.json --filename report.html --open"
   },
   "lint-staged": {
     "*.{ts,html}": [
