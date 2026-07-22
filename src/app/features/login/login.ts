@@ -2,7 +2,9 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
-import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
+import { AnalyticsService } from '@core/services/analytics.service';
+import { provideTranslocoScope, TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import * as Sentry from '@sentry/angular';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +19,8 @@ export class Login {
 
   #router = inject(Router);
   #authService = inject(AuthService);
+  #analyticsService = inject(AnalyticsService);
+  #translocoService = inject(TranslocoService);
 
   constructor() {
     effect(() => {
@@ -36,13 +40,26 @@ export class Login {
 
     try {
       await this.#authService.loginWithGoogle();
+
+      const user = this.#authService.getUserData();
+      const userEmail = user?.email || 'google_user_without_email';
+
+      Sentry.setUser({
+        email: userEmail,
+      });
+
+      this.#analyticsService.trackEvent('login_success', {
+        userEmail: userEmail,
+      });
     } catch (error: unknown) {
       this.loginError.set(
-        error instanceof Error ? error.message : 'Error al iniciar sesión con Google'
+        error instanceof Error ? error.message : this.#translocoService.translate('login.errorText')
       );
-      console.error('Error en login:', error);
+      console.error(this.#translocoService.translate('login.errorText'), error);
     } finally {
       this.isLoading.set(false);
     }
+
+    throw new Error(this.#translocoService.translate('login.forcedErrorText'));
   }
 }

@@ -8,7 +8,8 @@
     "title": "¿Cerrar sesión?",
     "message": "Estás a punto de salir de tu cuenta en Vet-Link. Deberás volver a ingresar tus credenciales para acceder a los datos de monitoreo de los pacientes.",
     "cancel": "Cancelar",
-    "confirm": "Sí, cerrar sesión"
+    "confirm": "Sí, cerrar sesión",
+    "error": "Error al cerrar sesión durante el tracking:"
   },
   "user-agent-card": {
     "version": "Versión",

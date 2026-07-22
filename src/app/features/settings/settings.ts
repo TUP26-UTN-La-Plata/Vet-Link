@@ -1,10 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { AuthService } from '@core/services/auth.service';
+import { AnalyticsService } from '@core/services/analytics.service';
 import { ConfirmModal } from '@shared/components/confirm-modal/confirm-modal';
 import { UserAgentCard } from './user-agent-card/user-agent-card';
 import { ProfileCard } from './profile-card/profile-card';
 import { SettingsCard } from './settings-card/settings-card';
-import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
+import { provideTranslocoScope, TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import * as Sentry from '@sentry/angular';
 
 @Component({
   selector: 'app-settings',
@@ -14,7 +16,9 @@ import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
   styleUrl: './settings.css',
 })
 export class Settings {
-  private readonly authService = inject(AuthService);
+  #authService = inject(AuthService);
+  #analyticsService = inject(AnalyticsService);
+  #translocoService = inject(TranslocoService);
 
   protected logoutModalOpen = false;
 
@@ -28,6 +32,20 @@ export class Settings {
 
   protected async onLogoutConfirm(): Promise<void> {
     this.logoutModalOpen = false;
-    await this.authService.logout();
+
+    const user = this.#authService.getUserData();
+    const userEmail = user?.email || 'google_user_without_email';
+
+    Sentry.setUser(null);
+
+    try {
+      this.#analyticsService.trackEvent('logout_user', {
+        userEmail: userEmail,
+      });
+
+      await this.#authService.logout();
+    } catch (error) {
+      console.error(this.#translocoService.translate('settings.logout.error'), error);
+    }
   }
 }

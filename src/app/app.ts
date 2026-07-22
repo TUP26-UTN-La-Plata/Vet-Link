@@ -4,6 +4,7 @@ import { PrimeNG } from 'primeng/config';
 import { TranslocoService } from '@jsverse/transloco';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import * as Sentry from '@sentry/angular';
 
 @Component({
   selector: 'app-root',
@@ -58,5 +59,15 @@ export class App implements OnInit {
       detail: this.#translocoService.translate('offline.detail'),
       sticky: true,
     });
+  }
+
+  public throwTestError(): void {
+    // Send a log before throwing the error
+    Sentry.logger.info(Sentry.logger.fmt`User ${'sentry-test'} triggered test error button`, {
+      action: 'test_error_button_click',
+    });
+    // Send a test metric before throwing the error
+    Sentry.metrics.count('test_counter', 1);
+    throw new Error('Sentry Test Error');
   }
 }

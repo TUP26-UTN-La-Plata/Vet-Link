@@ -14,6 +14,7 @@ import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
+import { AnalyticsService } from '@core/services/analytics.service';
 
 @Component({
   selector: 'app-patients',
@@ -78,6 +79,7 @@ export class Patients implements OnInit {
   readonly #cd = inject(ChangeDetectorRef);
   readonly #destroyRef = inject(DestroyRef);
   readonly #translocoService = inject(TranslocoService);
+  readonly #analyticsService = inject(AnalyticsService);
 
   ngOnInit(): void {
     this.loadData();
@@ -91,6 +93,14 @@ export class Patients implements OnInit {
           this.#initializeSortOptions(translations);
         }
       });
+  }
+
+  onLayoutChange(newLayout: 'grid' | 'list'): void {
+    this.layout = newLayout;
+
+    this.#analyticsService.trackEvent('layout_change', {
+      layout: newLayout,
+    });
   }
 
   #initializeSortOptions(t: Record<string, unknown>): void {
