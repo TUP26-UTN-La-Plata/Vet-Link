@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "721264060677",
+    "project_id": "vet-link-859a3",
+    "storage_bucket": "vet-link-859a3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721264060677:android:80ffebeb358787a345ef6c",
+        "android_client_info": {
+          "package_name": "com.vetlink.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "721264060677-juc02n69of3q21gk92314ktfsbeb6ft6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0F_4r5V9YXpGrji4d4X2FGRAPsmDISN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "721264060677-juc02n69of3q21gk92314ktfsbeb6ft6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

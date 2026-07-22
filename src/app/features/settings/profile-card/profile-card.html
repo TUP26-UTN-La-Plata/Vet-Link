@@ -3,7 +3,7 @@
     <div class="flex w-full flex-row justify-between gap-4 border-b-2 border-neutral/20 p-4 pb-4">
       <div class="flex justify-center items-center w-32">
         <img
-          [src]="authService.userData()?.photoURL || '/avatar.webp'"
+          [src]="authService.getUserData()?.photoURL || '/avatar.webp'"
           [alt]="g('profile-card.altAvatar')"
           class="h-16 w-16 rounded-full"
           (error)="$event.target.src = '/avatar.webp'" />
@@ -11,12 +11,14 @@
       <div class="flex flex-col justify-center items-start w-full">
         <h4>
           {{
-            authService.userData()?.name || authService.userData()?.email || g('profile-card.user')
+            authService.getUserData()?.name ||
+              authService.getUserData()?.email ||
+              g('profile-card.user')
           }}
         </h4>
-        @if (authService.userData()?.email) {
+        @if (authService.getUserData()?.email) {
           <p class="text-sm text-muted">
-            {{ authService.userData()?.email }}
+            {{ authService.getUserData()?.email }}
           </p>
         } @else {
           <p class="text-sm text-muted">

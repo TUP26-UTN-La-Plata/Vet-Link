@@ -7,8 +7,9 @@ import {
   GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
-  User,
 } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { firebaseConfig } from '../config/firebase.config';
 
 export interface UserData {
@@ -17,14 +18,35 @@ export interface UserData {
   photoURL: string;
 }
 
+interface AppUser {
+  displayName?: string | null;
+  email?: string | null;
+  photoURL?: string | null;
+  uid?: string | null;
+}
+
+// Shape returned by the native Capacitor FirebaseAuthentication plugin
+interface NativeFirebaseUser extends AppUser {
+  // some native responses use `photoUrl` (lowercase) instead of `photoURL`
+  photoUrl?: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   #auth = getAuth(initializeApp(firebaseConfig));
   #router = inject(Router);
-  #firebaseUser = signal<User | null | undefined>(undefined);
+  #firebaseUser = signal<AppUser | null | undefined>(undefined);
   #isSigningOut = false;
+
+  #isCapacitor(): boolean {
+    try {
+      return Capacitor.getPlatform && Capacitor.getPlatform() !== 'web';
+    } catch {
+      return false;
+    }
+  }
 
   readonly authState = this.#firebaseUser.asReadonly();
   readonly isLoaded = computed(() => this.#firebaseUser() !== undefined);
@@ -47,27 +69,106 @@ export class AuthService {
   }
 
   #initializeFirebase(): void {
-    onAuthStateChanged(this.#auth, async (firebaseUser) => {
-      this.#firebaseUser.set(firebaseUser);
-      
-      if (firebaseUser === null && this.#isSigningOut) {
-        await this.#clearBrowserState();
-        this.#isSigningOut = false;
-        await this.#router.navigate(['/login']);
+    if (this.#isCapacitor()) {
+      // On native (Capacitor) try to get the current native user from the plugin
+      FirebaseAuthentication.getCurrentUser()
+        .then((nativeUser) => {
+          const n = nativeUser as NativeFirebaseUser | null | undefined;
+          if (n && n.uid) {
+            this.#firebaseUser.set({
+              displayName: n.displayName ?? '',
+              email: n.email ?? '',
+              photoURL: n.photoUrl ?? n.photoURL ?? '/avatar.webp',
+              uid: n.uid ?? null,
+            });
+          } else {
+            this.#firebaseUser.set(null);
+          }
+        })
+        .catch(() => {
+          this.#firebaseUser.set(null);
+        });
+
+      try {
+        FirebaseAuthentication.addListener?.(
+          'authStateChange',
+          (data?: { user?: NativeFirebaseUser | null }) => {
+            const u = data?.user as NativeFirebaseUser | null | undefined;
+            if (u) {
+              this.#firebaseUser.set({
+                displayName: u.displayName ?? '',
+                email: u.email ?? '',
+                photoURL: u.photoUrl ?? u.photoURL ?? '/avatar.webp',
+                uid: u.uid ?? null,
+              });
+            } else {
+              this.#firebaseUser.set(null);
+            }
+          }
+        );
+      } catch {
+        // ignore if plugin doesn't support this listener shape
       }
-    });
+    } else {
+      onAuthStateChanged(this.#auth, async (firebaseUser) => {
+        if (firebaseUser) {
+          this.#firebaseUser.set({
+            displayName: firebaseUser.displayName ?? '',
+            email: firebaseUser.email ?? '',
+            photoURL: firebaseUser.photoURL ?? '/avatar.webp',
+            uid: firebaseUser.uid ?? null,
+          });
+        } else {
+          this.#firebaseUser.set(null);
+        }
+
+        if (firebaseUser === null && this.#isSigningOut) {
+          await this.#clearBrowserState();
+          this.#isSigningOut = false;
+          await this.#router.navigate(['/login']);
+        }
+      });
+    }
   }
 
   async loginWithGoogle(): Promise<void> {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(this.#auth, provider);
+    if (this.#isCapacitor()) {
+      // Use native plugin on Capacitor platforms
+      await FirebaseAuthentication.signInWithGoogle();
+      // refresh native user
+      try {
+        const nativeUser = await FirebaseAuthentication.getCurrentUser();
+        const n = nativeUser as NativeFirebaseUser | null | undefined;
+        if (n && n.uid) {
+          this.#firebaseUser.set({
+            displayName: n.displayName ?? '',
+            email: n.email ?? '',
+            photoURL: n.photoUrl ?? n.photoURL ?? '/avatar.webp',
+            uid: n.uid ?? null,
+          });
+        }
+      } catch {
+        // ignore
+      }
+    } else {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(this.#auth, provider);
+    }
   }
 
   async logout(): Promise<void> {
     this.#isSigningOut = true;
 
     try {
-      await signOut(this.#auth);
+      if (this.#isCapacitor()) {
+        await FirebaseAuthentication.signOut();
+        this.#firebaseUser.set(null);
+        await this.#clearBrowserState();
+        this.#isSigningOut = false;
+        await this.#router.navigate(['/login']);
+      } else {
+        await signOut(this.#auth);
+      }
     } catch (error) {
       this.#isSigningOut = false;
       throw error;
@@ -124,4 +225,15 @@ export class AuthService {
     };
   }
 
+  getUserId(): string | null {
+    return this.#firebaseUser()?.uid ?? null;
+  }
+
+  getUserEmail(): string | null {
+    return this.#firebaseUser()?.email ?? null;
+  }
+
+  getUserPhoto(): string | null {
+    return this.#firebaseUser()?.photoURL ?? null;
+  }
 }
