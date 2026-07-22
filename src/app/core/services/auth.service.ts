@@ -2,8 +2,11 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { initializeApp } from 'firebase/app';
 import {
-  getAuth,
+  initializeAuth,
+  browserLocalPersistence,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
@@ -25,9 +28,7 @@ interface AppUser {
   uid?: string | null;
 }
 
-// Shape returned by the native Capacitor FirebaseAuthentication plugin
 interface NativeFirebaseUser extends AppUser {
-  // some native responses use `photoUrl` (lowercase) instead of `photoURL`
   photoUrl?: string | null;
 }
 
@@ -35,7 +36,10 @@ interface NativeFirebaseUser extends AppUser {
   providedIn: 'root',
 })
 export class AuthService {
-  #auth = getAuth(initializeApp(firebaseConfig));
+  #auth = initializeAuth(initializeApp(firebaseConfig), {
+    persistence: browserLocalPersistence,
+  });
+
   #router = inject(Router);
   #firebaseUser = signal<AppUser | null | undefined>(undefined);
   #isSigningOut = false;
@@ -46,6 +50,11 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  // Método auxiliar para detectar si estamos en el entorno de escritorio de Tauri
+  #isTauri(): boolean {
+    return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
   }
 
   readonly authState = this.#firebaseUser.asReadonly();
@@ -110,6 +119,13 @@ export class AuthService {
         // ignore if plugin doesn't support this listener shape
       }
     } else {
+      // Si estamos en Tauri, capturamos el resultado de la redirección al arrancar la app
+      if (this.#isTauri()) {
+        getRedirectResult(this.#auth).catch((error) => {
+          console.error('Error al procesar redirección en Tauri:', error);
+        });
+      }
+
       onAuthStateChanged(this.#auth, async (firebaseUser) => {
         if (firebaseUser) {
           this.#firebaseUser.set({
@@ -152,7 +168,14 @@ export class AuthService {
       }
     } else {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(this.#auth, provider);
+
+      if (this.#isTauri()) {
+        // Usar redirección en entornos nativos de escritorio para evitar bloqueo de popups
+        await signInWithRedirect(this.#auth, provider);
+      } else {
+        // Mantener comportamiento estándar en la versión Web tradicional
+        await signInWithPopup(this.#auth, provider);
+      }
     }
   }
 
