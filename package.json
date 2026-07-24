@@ -25,10 +25,6 @@
   },
   "private": true,
   "packageManager": "npm@11.7.0",
-  "optionalDependencies": {
-    "@emnapi/core": "1.11.2",
-    "@emnapi/runtime": "1.11.2"
-  },
   "dependencies": {
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
