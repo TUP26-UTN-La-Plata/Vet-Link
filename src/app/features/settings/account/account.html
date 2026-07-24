@@ -1,0 +1,104 @@
+<ng-container *transloco="let t; prefix: 'settings.account'">
+  <div class="flex flex-col gap-6">
+    <div>
+      <h1>{{ t('title') }}</h1>
+      <p>{{ t('readonlyHint') }}</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+      <div class="rounded-xl bg-card p-6 shadow-md">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center">
+          <img
+            [src]="userData()?.photoURL || '/avatar.webp'"
+            alt=""
+            class="h-20 w-20 rounded-full object-cover"
+            (error)="$event.target.src = '/avatar.webp'" />
+          <div class="grid flex-1 gap-4 md:grid-cols-2">
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-base-content" for="name">{{
+                t('name')
+              }}</label>
+              <input
+                id="name"
+                pInputText
+                [value]="userData()?.name || ''"
+                readonly
+                class="cursor-not-allowed opacity-70" />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-base-content" for="email">{{
+                t('email')
+              }}</label>
+              <input
+                id="email"
+                pInputText
+                [value]="userData()?.email || ''"
+                readonly
+                class="cursor-not-allowed opacity-70" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl bg-card p-6 shadow-md">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-3">
+            <span class="text-sm font-semibold text-base-content">{{ t('phones') }}</span>
+            <div
+              class="flex flex-col gap-3"
+              formArrayName="phones"
+              role="group"
+              [attr.aria-label]="t('phones')">
+              @for (phoneControl of phones.controls; track phoneControl; let i = $index) {
+                <div class="flex items-center gap-3">
+                  <input
+                    pInputText
+                    class="flex-1"
+                    [formControlName]="i"
+                    [attr.aria-label]="t('phones')" />
+                  <app-action-button
+                    [label]="t('removePhone')"
+                    icon="pi pi-trash"
+                    variant="dangerSoft"
+                    (clicked)="removePhone(i)" />
+                </div>
+              }
+            </div>
+            <app-action-button
+              [label]="t('addPhone')"
+              icon="pi pi-plus"
+              variant="gray"
+              (clicked)="addPhone()" />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-base-content" for="address">{{
+              t('address')
+            }}</label>
+            <input id="address" pInputText formControlName="address" />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-base-content" for="birthDate">{{
+              t('birthDate')
+            }}</label>
+            <input id="birthDate" type="date" pInputText formControlName="birthDate" />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-end gap-3">
+        <app-action-button
+          [label]="t('cancel')"
+          icon="pi pi-times"
+          variant="gray"
+          (clicked)="onCancel()" />
+        <app-action-button
+          [label]="t('save')"
+          icon="pi pi-check"
+          variant="green"
+          (clicked)="onSubmit()" />
+      </div>
+    </form>
+  </div>
+</ng-container>

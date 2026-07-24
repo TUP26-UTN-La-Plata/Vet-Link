@@ -25,6 +25,23 @@
     "editButton": "Editar perfil",
     "user": "Usuario",
     "connectedUser": "Usuario conectado",
-    "altAvatar": "Avatar"
+    "altAvatar": "Avatar",
+    "phones": "Teléfonos",
+    "address": "Dirección",
+    "birthDate": "Fecha de nacimiento",
+    "noData": "Sin datos"
+  },
+  "account": {
+    "title": "Editar perfil",
+    "readonlyHint": "Estos datos provienen de tu cuenta de Google y no se pueden modificar.",
+    "name": "Nombre",
+    "email": "Correo",
+    "phones": "Teléfonos",
+    "addPhone": "Agregar teléfono",
+    "removePhone": "Quitar",
+    "address": "Dirección",
+    "birthDate": "Fecha de nacimiento",
+    "save": "Guardar",
+    "cancel": "Cancelar"
   }
 }
