@@ -5,9 +5,9 @@ import {
   initializeAuth,
   browserLocalPersistence,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithCredential,
   GoogleAuthProvider,
+  browserPopupRedirectResolver,
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
@@ -52,7 +52,6 @@ export class AuthService {
     }
   }
 
-  // Método auxiliar para detectar si estamos en el entorno de escritorio de Tauri
   #isTauri(): boolean {
     return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
   }
@@ -79,7 +78,6 @@ export class AuthService {
 
   #initializeFirebase(): void {
     if (this.#isCapacitor()) {
-      // On native (Capacitor) try to get the current native user from the plugin
       FirebaseAuthentication.getCurrentUser()
         .then((nativeUser) => {
           const n = nativeUser as NativeFirebaseUser | null | undefined;
@@ -116,14 +114,11 @@ export class AuthService {
           }
         );
       } catch {
-        // ignore if plugin doesn't support this listener shape
+        // ignore
       }
     } else {
-      // Si estamos en Tauri, capturamos el resultado de la redirección al arrancar la app
       if (this.#isTauri()) {
-        getRedirectResult(this.#auth).catch((error) => {
-          console.error('Error al procesar redirección en Tauri:', error);
-        });
+        this.#setupTauriDeepLinkListener();
       }
 
       onAuthStateChanged(this.#auth, async (firebaseUser) => {
@@ -147,11 +142,60 @@ export class AuthService {
     }
   }
 
+  async #setupTauriDeepLinkListener(): Promise<void> {
+    if (!this.#isTauri()) return;
+
+    try {
+      const { listen } = await import('@tauri-apps/api/event');
+
+      // 1. ESCUCHAR LA INTERCEPCIÓN DE INSTANCIA ÚNICA (Crucial para Windows)
+      await listen<{ args: string[]; cwd: string }>('single-instance', (event) => {
+        console.log('Argumentos de instancia única recibidos en Tauri:', event.payload.args);
+
+        // Buscamos dentro de la lista de argumentos de Windows cuál contiene nuestro esquema
+        const urlString = event.payload.args.find((arg) => arg.startsWith('vetlink-app://'));
+
+        if (urlString) {
+          console.log('URL de Deep Link detectada:', urlString);
+          this.#procesarTokenDeRetorno(urlString);
+        }
+      });
+
+      // 2. Escuchar enlaces en caliente por canal estándar (Útil para depuración o macOS)
+      await listen<{ urls: string[] }>('tauri://deep-link', (event) => {
+        const urlString = event.payload.urls.at(0);
+        if (urlString && urlString.startsWith('vetlink-app://')) {
+          this.#procesarTokenDeRetorno(urlString);
+        }
+      });
+    } catch (error) {
+      console.error('Error configurando los listeners de Deep Link en Tauri:', error);
+    }
+  }
+
+  async #procesarTokenDeRetorno(urlString: string): Promise<void> {
+    try {
+      const urlObj = new URL(urlString);
+      const token = urlObj.searchParams.get('token');
+
+      if (token) {
+        console.log('Procesando Access Token oficial de Google en Tauri...');
+
+        const credential = GoogleAuthProvider.credential(null, token);
+
+        await signInWithCredential(this.#auth, credential);
+
+        console.log('¡Sesión autorizada exitosamente en el núcleo de Tauri!');
+      }
+    } catch (error) {
+      console.error('Error al procesar el inicio de sesión desde Tauri:', error);
+    }
+  }
+
   async loginWithGoogle(): Promise<void> {
     if (this.#isCapacitor()) {
-      // Use native plugin on Capacitor platforms
+      // Flujo nativo inalterado para Android/iOS con Capacitor
       await FirebaseAuthentication.signInWithGoogle();
-      // refresh native user
       try {
         const nativeUser = await FirebaseAuthentication.getCurrentUser();
         const n = nativeUser as NativeFirebaseUser | null | undefined;
@@ -166,16 +210,24 @@ export class AuthService {
       } catch {
         // ignore
       }
-    } else {
-      const provider = new GoogleAuthProvider();
-
-      if (this.#isTauri()) {
-        // Usar redirección en entornos nativos de escritorio para evitar bloqueo de popups
-        await signInWithRedirect(this.#auth, provider);
-      } else {
-        // Mantener comportamiento estándar en la versión Web tradicional
-        await signInWithPopup(this.#auth, provider);
+    } else if (this.#isTauri()) {
+      // Flujo nativo inalterado para lanzar el Chrome externo desde Tauri
+      try {
+        const { openUrl } = await import('@tauri-apps/plugin-opener');
+        const urlLoginWeb = 'http://localhost:4200/login-tauri';
+        await openUrl(urlLoginWeb);
+      } catch (error) {
+        console.error('Error abriendo el navegador externo:', error);
       }
+    } else {
+      //  Si se llama desde la web suelta pero proviniendo de la ruta de tauri, no hacer nada
+      if (typeof window !== 'undefined' && window.location.pathname.includes('login-tauri')) {
+        return;
+      }
+
+      // Pasamos browserPopupRedirectResolver como tercer argumento para forzar la activación del gestor de popups de Chrome
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(this.#auth, provider, browserPopupRedirectResolver);
     }
   }
 

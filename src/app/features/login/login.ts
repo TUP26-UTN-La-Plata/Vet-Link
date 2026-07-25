@@ -14,6 +14,7 @@ import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
 export class Login {
   isLoading = signal(false);
   loginError = signal<string | null>(null);
+  isTauriComponent = false;
 
   #router = inject(Router);
   #authService = inject(AuthService);
