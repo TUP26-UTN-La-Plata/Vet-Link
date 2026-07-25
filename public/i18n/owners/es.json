@@ -1,0 +1,21 @@
+{
+  "title": "Gestión de Propietarios",
+  "description": "Consulta y filtra la lista de propietarios.",
+  "placeholderSearch": "Buscar propietario...",
+  "addOwner": "Agregar Propietario",
+  "loadingText": "Cargando propietarios...",
+  "emptyText": "No se encontraron propietarios.",
+  "unknown": "Desconocido",
+  "no_description": "Sin descripción",
+  "emptyMessage": "No se encontraron resultados",
+  "card": {
+    "owner": "Propietario",
+    "email": "Email",
+    "phone": "Teléfono",
+    "location": "Ubicación",
+    "description": "Descripción"
+  },
+  "errors": {
+    "loadFail": "Lo sentimos, no pudimos cargar la lista de propietarios. Por favor, intenta nuevamente."
+  }
+}

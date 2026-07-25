@@ -10,6 +10,10 @@
         [icon]="'pi pi-heart'"
         [routerLink]="'/patients'" />
       <app-nav-button
+        [label]="g('layout.nav.owners')"
+        [icon]="'pi pi-users'"
+        [routerLink]="'/owners'" />
+      <app-nav-button
         [label]="g('layout.nav.settings')"
         [icon]="'pi pi-cog'"
         [routerLink]="'/settings'" />
@@ -42,6 +46,11 @@
             [label]="g('layout.nav.patients')"
             [icon]="'pi pi-heart'"
             [routerLink]="'/patients'" />
+          <app-nav-button
+            variant="bottom"
+            [label]="g('layout.nav.owners')"
+            [icon]="'pi pi-users'"
+            [routerLink]="'/owners'" />
           <app-nav-button
             variant="bottom"
             [label]="g('layout.nav.settings')"
