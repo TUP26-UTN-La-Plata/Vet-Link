@@ -61,6 +61,22 @@
                     icon="pi pi-trash"
                     variant="dangerSoft"
                     (clicked)="removePhone(i)" />
+                  @if (phoneControl.invalid && (phoneControl.touched || phoneControl.dirty)) {
+                    <small class="text-xs text-red-500">
+                      @if (phoneControl.errors?.['required']) {
+                        {{ t('requiredPhone') }}
+                      }
+                      @if (phoneControl.errors?.['pattern']) {
+                        {{ t('invalidPhone') }}
+                      }
+                      @if (phoneControl.errors?.['minlength']) {
+                        {{ t('minlengthPhone') }}
+                      }
+                      @if (phoneControl.errors?.['maxlength']) {
+                        {{ t('maxlengthPhone') }}
+                      }
+                    </small>
+                  }
                 </div>
               }
             </div>
@@ -76,13 +92,41 @@
               t('address')
             }}</label>
             <input id="address" pInputText formControlName="address" />
+            @if (form.controls.address.invalid && form.controls.address.touched) {
+              <small class="text-xs text-red-500">
+                @if (form.controls.address.errors?.['required']) {
+                  {{ t('requiredAddress') }}
+                }
+                @if (form.controls.address.errors?.['minlength']) {
+                  {{ t('minlengthAddress') }}
+                }
+                @if (form.controls.address.errors?.['maxlength']) {
+                  {{ t('maxlengthAddress') }}
+                }
+              </small>
+            }
           </div>
 
           <div class="flex flex-col gap-2">
             <label class="text-sm font-semibold text-base-content" for="birthDate">{{
               t('birthDate')
             }}</label>
-            <input id="birthDate" type="date" pInputText formControlName="birthDate" />
+            <input
+              id="birthDate"
+              type="date"
+              pInputText
+              formControlName="birthDate"
+              [max]="maxDate" />
+            @if (form.controls.birthDate.invalid && form.controls.birthDate.touched) {
+              <small class="text-xs text-red-500">
+                @if (form.controls.birthDate.errors?.['required']) {
+                  {{ t('requiredBirthDate') }}
+                }
+                @if (form.controls.birthDate.errors?.['futureDate']) {
+                  {{ t('futureDateBirthDate') }}
+                }
+              </small>
+            }
           </div>
         </div>
       </div>

@@ -42,6 +42,15 @@
     "address": "Dirección",
     "birthDate": "Fecha de nacimiento",
     "save": "Guardar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "requiredPhone": "Debe ingresar un número de teléfono.",
+    "invalidPhone": "Solo se permiten números.",
+    "minlengthPhone": "Debe tener al menos 2 dígitos.",
+    "maxlengthPhone": "Debe tener menos de 15 dígitos.",
+    "requiredAddress": "Debe ingresar una dirección.",
+    "minlengthAddress": "Debe tener al menos 2 caracteres.",
+    "maxlengthAddress": "Debe tener menos de 128 caracteres.",
+    "requiredBirthDate": "Debe ingresar una fecha de nacimiento.",
+    "futureDateBirthDate": "La fecha de nacimiento no puede ser posterior a la fecha actual."
   }
 }

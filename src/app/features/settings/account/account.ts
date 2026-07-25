@@ -1,5 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '@core/services/auth.service';
@@ -7,6 +16,15 @@ import { ProfileStateService } from '@core/services/profile-state.service';
 import { ActionButton } from '@shared/ui/action-button/action-button';
 import { provideTranslocoScope, TranslocoModule } from '@jsverse/transloco';
 import { UserProfile } from './account.interface';
+
+export function maxDateValidator(maxDateStr: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) {
+      return null;
+    }
+    return control.value > maxDateStr ? { futureDate: true } : null;
+  };
+}
 
 @Component({
   selector: 'app-account',
@@ -22,10 +40,19 @@ export class Account implements OnInit {
   readonly #profileStateService = inject(ProfileStateService);
 
   protected readonly userData = this.#authService.userData;
+
+  protected readonly maxDate = new Date().toISOString().split('T')[0];
+
   protected form = this.#fb.group({
-    phones: this.#fb.array([this.#createPhoneControl('')]),
-    address: this.#fb.control('', { nonNullable: true }),
-    birthDate: this.#fb.control('', { nonNullable: true }),
+    phones: this.#fb.array([this.#createPhoneControl('', true)]),
+    address: this.#fb.control('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(128)],
+    }),
+    birthDate: this.#fb.control('', {
+      nonNullable: true,
+      validators: [Validators.required, maxDateValidator(this.maxDate)],
+    }),
   });
 
   ngOnInit(): void {
@@ -36,8 +63,8 @@ export class Account implements OnInit {
       'phones',
       this.#fb.array(
         profile.phones.length
-          ? profile.phones.map((phone) => this.#createPhoneControl(phone))
-          : [this.#createPhoneControl('')]
+          ? profile.phones.map((phone, index) => this.#createPhoneControl(phone, index === 0))
+          : [this.#createPhoneControl('', true)]
       )
     );
     this.form.patchValue({
@@ -51,7 +78,7 @@ export class Account implements OnInit {
   }
 
   protected addPhone(): void {
-    this.phones.push(this.#createPhoneControl(''));
+    this.phones.push(this.#createPhoneControl('', false));
   }
 
   protected removePhone(index: number): void {
@@ -64,8 +91,15 @@ export class Account implements OnInit {
   }
 
   protected onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     const profile: UserProfile = {
-      phones: this.phones.controls.map((control) => control.value.trim()),
+      phones: this.phones.controls
+        .map((control) => control.value.trim())
+        .filter((phone) => phone.length > 0),
       address: this.form.controls.address.value.trim(),
       birthDate: this.form.controls.birthDate.value,
     };
@@ -78,7 +112,20 @@ export class Account implements OnInit {
     this.#router.navigate(['/settings']);
   }
 
-  #createPhoneControl(value: string): FormControl<string> {
-    return this.#fb.control(value, { nonNullable: true });
+  #createPhoneControl(value: string, isRequired = false): FormControl<string> {
+    const validators = [
+      Validators.minLength(2),
+      Validators.maxLength(15),
+      Validators.pattern(/^[0-9]*$/),
+    ];
+
+    if (isRequired) {
+      validators.push(Validators.required);
+    }
+
+    return this.#fb.control(value, {
+      nonNullable: true,
+      validators,
+    });
   }
 }
