@@ -64,7 +64,8 @@
     "login": "Vet-Link - Inicio de Sesión",
     "patients": "Vet-Link - Gestión de Pacientes",
     "settings": "Vet-Link - Configuración",
-    "account": "Vet-Link - Editar perfil"
+    "account": "Vet-Link - Editar perfil",
+    "owners": "Vet-Link - Propietarios"
   },
   "common": {
     "altLogo": "Logo Vet-Link",
