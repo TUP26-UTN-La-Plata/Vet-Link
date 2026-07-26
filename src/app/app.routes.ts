@@ -37,6 +37,11 @@ export const routes: Routes = [
         title: 'pageTitle.settings',
         loadComponent: () => import('./features/settings/settings').then((m) => m.Settings),
       },
+      {
+        path: 'settings/account',
+        title: 'pageTitle.account',
+        loadComponent: () => import('./features/settings/account/account').then((m) => m.Account),
+      },
       { path: '', redirectTo: 'patients', pathMatch: 'full' },
     ],
   },
