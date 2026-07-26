@@ -1,6 +1,7 @@
 import { Component, ChangeDetectorRef, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Patient, PatientsPaginatorPt, SortCascadeOption } from './patients.interface';
 import { PatientsService } from './patients.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -14,11 +15,13 @@ import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
+import { AnalyticsService } from '@core/services/analytics.service';
 
 @Component({
   selector: 'app-patients',
   imports: [
     FormsModule,
+    RouterLink,
     ProgressSpinnerModule,
     MessageModule,
     CardModule,
@@ -78,6 +81,7 @@ export class Patients implements OnInit {
   readonly #cd = inject(ChangeDetectorRef);
   readonly #destroyRef = inject(DestroyRef);
   readonly #translocoService = inject(TranslocoService);
+  readonly #analyticsService = inject(AnalyticsService);
 
   ngOnInit(): void {
     this.loadData();
@@ -91,6 +95,14 @@ export class Patients implements OnInit {
           this.#initializeSortOptions(translations);
         }
       });
+  }
+
+  onLayoutChange(newLayout: 'grid' | 'list'): void {
+    this.layout = newLayout;
+
+    this.#analyticsService.trackEvent('layout_change', {
+      layout: newLayout,
+    });
   }
 
   #initializeSortOptions(t: Record<string, unknown>): void {

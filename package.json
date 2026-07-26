@@ -10,7 +10,9 @@
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"src/**/*.{html,ts,scss,css,json}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lhci": "lhci autorun",
+    "analyze": "npm run build && esbuild-visualizer --metadata dist/Vet-Link/stats.json --filename report.html --open"
   },
   "lint-staged": {
     "*.{ts,html}": [
@@ -36,10 +38,12 @@
     "@capacitor/cli": "^8.4.2",
     "@capacitor/core": "^8.4.2",
     "@jsverse/transloco": "^8.3.0",
+    "@lhci/cli": "^0.15.1",
     "@primeuix/themes": "^2.0.3",
     "@tauri-apps/plugin-deep-link": "^2.4.9",
     "@tauri-apps/plugin-opener": "^2.5.4",
     "@tauri-apps/plugin-shell": "^2.3.5",
+    "@sentry/angular": "^10.62.0",
     "firebase": "^12.13.0",
     "primeicons": "^7.0.0",
     "primeng": "^21.1.6",
@@ -56,6 +60,7 @@
     "@tauri-apps/cli": "^2.11.4",
     "angular-eslint": "21.4.0",
     "autoprefixer": "^10.5.0",
+    "esbuild-visualizer": "^0.7.0",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.6.0",

@@ -66,7 +66,8 @@
           </div>
 
           <p-selectButton
-            [(ngModel)]="layout"
+            [ngModel]="layout"
+            (ngModelChange)="onLayoutChange($event)"
             [options]="layoutOptions"
             [allowEmpty]="false"
             class="hidden md:block shrink-0">
@@ -104,7 +105,7 @@
                 <div
                   class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full">
                   @for (patient of items; track patient.id) {
-                    <div class="group">
+                    <a [routerLink]="['/patients', patient.id]" class="group block h-full">
                       <p-card
                         class="h-full border-2 border-neutral/10 shadow-none hover:border-neutral/30 group-hover:scale-105 transition-all duration-300 rounded-2xl overflow-hidden bg-card">
                         <ng-template pTemplate="header">
@@ -157,7 +158,7 @@
                           </p>
                         </div>
                       </p-card>
-                    </div>
+                    </a>
                   }
                 </div>
               </ng-template>
@@ -165,7 +166,8 @@
               <ng-template #list let-items pTemplate="list">
                 <div class="flex flex-col gap-2 w-full">
                   @for (patient of items; track patient.id) {
-                    <div
+                    <a
+                      [routerLink]="['/patients', patient.id]"
                       class="flex items-center gap-4 p-3 bg-card border-2 border-neutral/10 rounded-xl hover:border-neutral/30 transition-all cursor-pointer">
                       <img
                         [src]="patient.image"
@@ -205,7 +207,7 @@
                         </div>
                       </div>
                       <i class="pi pi-chevron-right text-neutral/30 px-2"></i>
-                    </div>
+                    </a>
                   }
                 </div>
               </ng-template>

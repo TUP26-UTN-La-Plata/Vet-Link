@@ -1,0 +1,189 @@
+<ng-container *transloco="let t; prefix: 'patients'">
+  <div class="flex flex-col gap-6">
+    <div class="sticky top-[-1.5rem] z-10 pt-6 pb-4 bg-main">
+      <div class="flex flex-col gap-2">
+        <button
+          type="button"
+          class="flex w-fit items-center gap-2 rounded-full border border-neutral/15 bg-card px-3 py-2 text-sm font-semibold text-neutral transition hover:bg-neutral/10"
+          (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+          <span>{{ t('detail.back') }}</span>
+        </button>
+        <h1 class="text-2xl font-bold text-neutral">{{ t('detail.title') }}</h1>
+        <p class="text-sm text-muted">{{ t('detail.description') }}</p>
+      </div>
+    </div>
+
+    @if (loading) {
+      <div class="flex flex-col items-center justify-center py-20">
+        <p-progressSpinner class="w-12 h-12" strokeWidth="4"></p-progressSpinner>
+        <p class="mt-4 text-sm text-muted animate-pulse font-medium">
+          {{ t('loadingText') }}
+        </p>
+      </div>
+    } @else {
+      @if (errorMessage) {
+        <p-message severity="error" styleClass="w-full !border-l-4 !p-4">
+          {{ errorMessage }}
+        </p-message>
+      }
+
+      @if (patient && !errorMessage) {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+          <div class="grid gap-6 xl:grid-cols-[320px_1fr]">
+            <div class="rounded-3xl border border-neutral/10 bg-card p-4 shadow-sm">
+              <div class="flex flex-col gap-4">
+                <img
+                  [src]="patient.image"
+                  [alt]="patient.name"
+                  class="h-72 w-full rounded-2xl object-cover"
+                  onerror="this.src = '/no-image.webp'" />
+                <div class="rounded-2xl bg-main/70 p-4">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">
+                    {{ t('detail.profile') }}
+                  </p>
+                  <h2 class="mt-2 text-xl font-bold text-neutral">{{ patient.name }}</h2>
+                  <p class="mt-2 text-sm text-muted">{{ patient.description }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid gap-4 lg:grid-cols-2">
+              <div class="rounded-3xl border border-neutral/10 bg-card p-4 shadow-sm lg:col-span-2">
+                <div class="grid gap-4 md:grid-cols-2">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="name">{{
+                      t('detail.name')
+                    }}</label>
+                    <input id="name" pInputText formControlName="name" />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="breed">{{
+                      t('detail.breed')
+                    }}</label>
+                    <input id="breed" pInputText formControlName="breed" />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="age">{{
+                      t('detail.age')
+                    }}</label>
+                    <input id="age" pInputText type="number" formControlName="age" />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="origin">{{
+                      t('detail.origin')
+                    }}</label>
+                    <input id="origin" pInputText formControlName="origin" />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="averageWeight">{{
+                      t('detail.averageWeight')
+                    }}</label>
+                    <input
+                      id="averageWeight"
+                      pInputText
+                      type="number"
+                      formControlName="averageWeight" />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="averageHeight">{{
+                      t('detail.averageHeight')
+                    }}</label>
+                    <input
+                      id="averageHeight"
+                      pInputText
+                      type="number"
+                      formControlName="averageHeight" />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="ownerName">{{
+                      t('detail.owner')
+                    }}</label>
+                    <input id="ownerName" pInputText formControlName="ownerName" />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="ownerEmail">{{
+                      t('detail.email')
+                    }}</label>
+                    <input id="ownerEmail" pInputText formControlName="ownerEmail" />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="ownerPhone">{{
+                      t('detail.phone')
+                    }}</label>
+                    <input id="ownerPhone" pInputText formControlName="ownerPhone" />
+                  </div>
+                  <div class="flex flex-col gap-2 lg:col-span-2">
+                    <label class="text-sm font-semibold text-neutral" for="image">{{
+                      t('detail.imageUrl')
+                    }}</label>
+                    <input id="image" pInputText formControlName="image" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-3xl border border-neutral/10 bg-card p-4 shadow-sm lg:col-span-2">
+                <div class="grid gap-4 md:grid-cols-2">
+                  <div class="flex flex-col gap-2 md:col-span-2">
+                    <label class="text-sm font-semibold text-neutral" for="description">{{
+                      t('detail.descriptionField')
+                    }}</label>
+                    <textarea
+                      id="description"
+                      pTextarea
+                      formControlName="description"
+                      rows="4"></textarea>
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="temperament">{{
+                      t('detail.temperament')
+                    }}</label>
+                    <textarea
+                      id="temperament"
+                      pTextarea
+                      formControlName="temperament"
+                      rows="3"></textarea>
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-semibold text-neutral" for="notes">{{
+                      t('detail.notes')
+                    }}</label>
+                    <textarea id="notes" pTextarea formControlName="notes" rows="3"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          @if (successMessage) {
+            <p-message severity="success" styleClass="w-full !border-l-4 !p-4">
+              {{ successMessage }}
+            </p-message>
+          }
+
+          <div class="flex flex-wrap justify-end gap-3">
+            <button
+              type="button"
+              class="rounded-full border border-neutral/15 bg-card px-5 py-2.5 text-sm font-semibold text-neutral transition hover:bg-neutral/10"
+              (click)="goBack()">
+              {{ t('detail.cancel') }}
+            </button>
+            <button
+              type="submit"
+              class="rounded-full bg-neutral px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral/90"
+              [disabled]="saving">
+              @if (saving) {
+                <span class="flex items-center gap-2">
+                  <i class="pi pi-spin pi-spinner"></i>
+                  {{ t('detail.saving') }}
+                </span>
+              } @else {
+                {{ t('detail.save') }}
+              }
+            </button>
+          </div>
+        </form>
+      }
+    }
+  </div>
+</ng-container>

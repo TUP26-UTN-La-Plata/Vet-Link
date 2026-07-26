@@ -21,6 +21,31 @@
   "pagination": {
     "report": "{first}-{last} de {totalRecords}"
   },
+  "detail": {
+    "title": "Detalle del paciente",
+    "description": "Revisa y actualiza la información del paciente.",
+    "back": "Volver a pacientes",
+    "profile": "Perfil",
+    "name": "Nombre",
+    "breed": "Raza",
+    "age": "Edad",
+    "origin": "Origen",
+    "averageWeight": "Peso promedio",
+    "averageHeight": "Altura promedio",
+    "owner": "Propietario",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "imageUrl": "URL de imagen",
+    "descriptionField": "Descripción",
+    "temperament": "Temperamento",
+    "notes": "Notas",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "notFound": "No se encontró el paciente solicitado.",
+    "loadError": "No se pudieron cargar los datos del paciente.",
+    "saved": "Paciente actualizado correctamente."
+  },
   "sort": {
     "name": "Nombre",
     "origin": "Origen",

@@ -24,6 +24,19 @@ export const routes: Routes = [
         loadComponent: () => import('./features/patients/patients').then((m) => m.Patients),
       },
       {
+        path: 'patients/:id',
+        title: 'pageTitle.patients',
+        loadComponent: () =>
+          import('./features/patients/patient-detail/patient-detail').then(
+            (m) => m.PatientDetailComponent
+          ),
+      },
+      {
+        path: 'owners',
+        title: 'pageTitle.owners',
+        loadComponent: () => import('./features/owners/owners').then((m) => m.OwnersComponent),
+      },
+      {
         path: 'settings',
         title: 'pageTitle.settings',
         loadComponent: () => import('./features/settings/settings').then((m) => m.Settings),

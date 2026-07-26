@@ -45,3 +45,9 @@ Thumbs.db
 
 # Firebase
 .firebase
+
+# Lighthouse CI
+.lighthouseci
+
+# esbuild-visualizer
+/report.html

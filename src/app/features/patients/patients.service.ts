@@ -14,4 +14,8 @@ export class PatientsService {
   getPatients(): Observable<Patient[]> {
     return this.#patientsStateService.getPatients();
   }
+
+  updatePatient(patient: Patient): void {
+    this.#patientsStateService.updatePatient(patient);
+  }
 }
