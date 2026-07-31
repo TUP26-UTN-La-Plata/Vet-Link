@@ -9,7 +9,7 @@
     "desktop:dev": "tauri dev",
     "desktop:build": "tauri build",
     "cap:sync": "npx cap sync",
-    "android:open": "npm run build && npx cap open android",
+    "android:open": "rm -rf ./android && npm run build && capacitor add android && capacitor sync android && capacitor open android",
     "test": "ng test",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
