@@ -2,9 +2,9 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "vet-link",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.vetlink.app",
   "build": {
-    "frontendDist": "../dist/Vet-Link/src",
+    "frontendDist": "../dist/Vet-Link/browser",
     "devUrl": "http://localhost:4200",
     "beforeDevCommand": "npm start",
     "beforeBuildCommand": "npm run build"
