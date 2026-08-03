@@ -16,7 +16,7 @@ pub fn run() {
             // Ahora que Emitter está en el scope, puedes usar .emit() de manera estricta
             let _ = app.emit("single-instance", SingleInstancePayload { args: argv, cwd });
         }))
-        .setup(|app| {
+        .setup(|_app| {
             #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
             {
                 use tauri_plugin_deep_link::DeepLinkExt;
