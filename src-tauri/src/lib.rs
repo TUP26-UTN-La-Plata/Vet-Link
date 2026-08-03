@@ -1,4 +1,4 @@
-use tauri::{Manager, Emitter};
+use tauri::Emitter;
 
 #[derive(Clone, serde::Serialize)]
 struct SingleInstancePayload {
@@ -17,7 +17,7 @@ pub fn run() {
             let _ = app.emit("single-instance", SingleInstancePayload { args: argv, cwd });
         }))
         .setup(|app| {
-            #[cfg(any(windows, target_os = "linux", target_os = "macos"))]
+            #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
             {
                 use tauri_plugin_deep_link::DeepLinkExt;
                 app.deep_link().register("vetlink-app")?;
