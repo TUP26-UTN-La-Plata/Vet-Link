@@ -16,6 +16,7 @@ import * as Sentry from '@sentry/angular';
 export class Login {
   isLoading = signal(false);
   loginError = signal<string | null>(null);
+  isTauriComponent = false;
 
   #router = inject(Router);
   #authService = inject(AuthService);

@@ -4,6 +4,10 @@ import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
   {
+    path: 'login-tauri',
+    loadComponent: () => import('./features/login/login-tauri').then((m) => m.LoginTauriComponent),
+  },
+  {
     path: 'login',
     title: 'pageTitle.login',
     canActivate: [guestGuard],
