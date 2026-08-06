@@ -12,7 +12,11 @@
   "emptyMessage": "No se encontraron resultados",
   "card": {
     "averageWeight": "Peso Prom.",
-    "averageHeight": "Altura Prom."
+    "averageHeight": "Altura Prom.",
+    "deleteTitle": "Eliminar Paciente",
+    "deleteMessage": "¿Estás seguro de que deseas eliminar a {{ name }}?",
+    "deleteConfirm": "Eliminar",
+    "deleteCancel": "Cancelar"
   },
   "list": {
     "weight": "Peso Prom.",

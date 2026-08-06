@@ -104,8 +104,14 @@ export class Account implements OnInit {
       birthDate: this.form.controls.birthDate.value,
     };
 
-    this.#profileStateService.updateProfile(profile);
-    this.#router.navigate(['/settings']);
+    this.#profileStateService.updateProfile(profile).subscribe({
+      next: () => {
+        this.#router.navigate(['/settings']);
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+      },
+    });
   }
 
   protected onCancel(): void {

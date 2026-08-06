@@ -62,7 +62,7 @@ export class PatientDetailComponent implements OnInit {
     const patientId = Number(this.#route.snapshot.paramMap.get('id'));
 
     if (!patientId) {
-      this.errorMessage = this.#getTranslation('detail.notFound');
+      this.errorMessage = this.#getTranslation('patients.detail.notFound');
       return;
     }
 
@@ -81,7 +81,7 @@ export class PatientDetailComponent implements OnInit {
           this.patient = patients.find((item) => item.id === patientId) ?? null;
 
           if (!this.patient) {
-            this.errorMessage = this.#getTranslation('detail.notFound');
+            this.errorMessage = this.#getTranslation('patients.detail.notFound');
             this.loading = false;
             this.#cd.detectChanges();
             return;
@@ -107,7 +107,7 @@ export class PatientDetailComponent implements OnInit {
           this.#cd.detectChanges();
         },
         error: () => {
-          this.errorMessage = this.#getTranslation('detail.loadError');
+          this.errorMessage = this.#getTranslation('patients.detail.loadError');
           this.loading = false;
           this.#cd.detectChanges();
         },
@@ -142,11 +142,23 @@ export class PatientDetailComponent implements OnInit {
       image: this.form.value.image ?? this.patient.image,
     };
 
-    this.#patientsService.updatePatient(updatedPatient);
-    this.saving = false;
-    this.successMessage = this.#getTranslation('detail.saved');
-    this.#cd.detectChanges();
-    this.goBack();
+    this.#patientsService
+      .updatePatient(updatedPatient)
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.successMessage = this.#getTranslation('patients.detail.saved');
+          this.#cd.detectChanges();
+          this.goBack();
+        },
+        error: (err) => {
+          console.error('Error actualizing patient:', err);
+          this.saving = false;
+          this.errorMessage = this.#getTranslation('patients.detail.loadError');
+          this.#cd.detectChanges();
+        },
+      });
   }
 
   goBack(): void {

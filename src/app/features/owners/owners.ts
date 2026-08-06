@@ -6,9 +6,12 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Owner } from './owners.interface';
-import { TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { PatientsStateService } from '../../core/services/items-state.service';
 import { AsyncPipe } from '@angular/common';
+import { UserRoleService } from '../../core/services/user-role.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-owners',
@@ -22,6 +25,7 @@ import { AsyncPipe } from '@angular/common';
     ProgressSpinnerModule,
     TranslocoModule,
     AsyncPipe,
+    ConfirmDialogModule,
   ],
   providers: [provideTranslocoScope('owners')],
   templateUrl: './owners.html',
@@ -29,6 +33,9 @@ import { AsyncPipe } from '@angular/common';
 })
 export class OwnersComponent implements OnInit {
   readonly ownersState = inject(PatientsStateService);
+  readonly userRoleService = inject(UserRoleService);
+  readonly #confirmationService = inject(ConfirmationService);
+  readonly #translocoService = inject(TranslocoService);
 
   readonly owners$ = this.ownersState.owners$;
   readonly filteredOwners$ = this.ownersState.filteredOwners$;
@@ -46,5 +53,22 @@ export class OwnersComponent implements OnInit {
 
   trackByOwner(_: number, owner: Owner): string {
     return owner.id;
+  }
+
+  confirmDeleteOwner(owner: Owner): void {
+    this.#confirmationService.confirm({
+      message: this.#translocoService.translate('owners.card.deleteMessage', { name: owner.name }),
+      header: this.#translocoService.translate('owners.card.deleteTitle'),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.#translocoService.translate('owners.card.deleteConfirm'),
+      rejectLabel: this.#translocoService.translate('owners.card.deleteCancel'),
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text p-button-sm',
+      accept: () => {
+        this.ownersState.deleteOwner(owner.id).subscribe({
+          error: (err) => console.error('Error al eliminar propietario:', err),
+        });
+      },
+    });
   }
 }
