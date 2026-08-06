@@ -10,6 +10,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { TranslocoModule, TranslocoService, provideTranslocoScope } from '@jsverse/transloco';
 import { PatientsService } from '../patients.service';
 import { Patient } from '../patients.interface';
+import { UserRoleService } from '@core/services/user-role.service';
 
 @Component({
   selector: 'app-patient-detail',
@@ -41,6 +42,7 @@ export class PatientDetailComponent implements OnInit {
   readonly #cd = inject(ChangeDetectorRef);
   readonly #destroyRef = inject(DestroyRef);
   readonly #translocoService = inject(TranslocoService);
+  readonly userRoleService = inject(UserRoleService);
 
   ngOnInit(): void {
     this.form = this.#fb.group({
@@ -103,6 +105,10 @@ export class PatientDetailComponent implements OnInit {
             image: this.patient.image ?? '',
           });
 
+          if (!this.userRoleService.isVet) {
+            this.form.disable();
+          }
+
           this.loading = false;
           this.#cd.detectChanges();
         },
@@ -115,35 +121,39 @@ export class PatientDetailComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid || !this.patient) {
+    if (!this.userRoleService.isVet || this.form.invalid || !this.patient) {
       this.form.markAllAsTouched();
       return;
     }
 
     this.saving = true;
     this.successMessage = null;
+    this.errorMessage = null;
 
-    const updatedPatient: Patient = {
-      ...this.patient,
-      ...this.form.getRawValue(),
-      id: this.patient.id,
-      name: this.form.value.name ?? this.patient.name,
-      description: this.form.value.description ?? this.patient.description,
-      averageWeight: Number(this.form.value.averageWeight ?? 0),
-      averageHeight: Number(this.form.value.averageHeight ?? 0),
-      origin: this.form.value.origin ?? this.patient.origin,
-      breed: this.form.value.breed ?? this.patient.name,
-      age: Number(this.form.value.age ?? 0),
-      ownerName: this.form.value.ownerName ?? '',
-      ownerEmail: this.form.value.ownerEmail ?? '',
-      ownerPhone: this.form.value.ownerPhone ?? '',
-      temperament: this.form.value.temperament ?? '',
-      notes: this.form.value.notes ?? '',
-      image: this.form.value.image ?? this.patient.image,
+    const rawForm = this.form.getRawValue();
+
+    const changes: Partial<Patient> = {
+      name: rawForm.name?.trim(),
+      description: rawForm.description?.trim(),
+      averageWeight: Number(rawForm.averageWeight ?? 0),
+      averageHeight: Number(rawForm.averageHeight ?? 0),
+      origin: rawForm.origin?.trim(),
+      breed: rawForm.breed?.trim(),
+      age: Number(rawForm.age ?? 0),
+      ownerName: rawForm.ownerName?.trim(),
+      ownerPhone: rawForm.ownerPhone?.trim(),
+      temperament: rawForm.temperament?.trim(),
+      notes: rawForm.notes?.trim(),
+      image: rawForm.image?.trim(),
     };
 
+    const ownerEmailValue = rawForm.ownerEmail?.trim();
+    if (ownerEmailValue) {
+      changes.ownerEmail = ownerEmailValue;
+    }
+
     this.#patientsService
-      .updatePatient(updatedPatient)
+      .patchPatient(this.patient.id, changes)
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe({
         next: () => {
@@ -153,9 +163,10 @@ export class PatientDetailComponent implements OnInit {
           this.goBack();
         },
         error: (err) => {
-          console.error('Error actualizing patient:', err);
+          console.error('Error al actualizar paciente con PATCH:', err);
           this.saving = false;
-          this.errorMessage = this.#getTranslation('patients.detail.loadError');
+          this.errorMessage =
+            err?.error?.message || 'No se pudieron guardar los cambios del paciente.';
           this.#cd.detectChanges();
         },
       });

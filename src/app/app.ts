@@ -13,7 +13,6 @@ import { AuthService } from '@core/services/auth.service';
   imports: [RouterOutlet, ToastModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
-  providers: [MessageService],
 })
 export class App implements OnInit {
   #primeng = inject(PrimeNG);

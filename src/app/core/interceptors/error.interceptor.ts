@@ -1,7 +1,9 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, throwError, switchMap, from } from 'rxjs';
+import { getAuth } from 'firebase/auth';
+import { MessageService } from 'primeng/api';
 
 export interface ApiErrorPayload {
   code: string;
@@ -13,6 +15,7 @@ export interface ApiErrorPayload {
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
+  const messageService = inject(MessageService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -20,37 +23,73 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         const apiError = error.error as ApiErrorPayload;
 
         switch (apiError.code) {
-          // 1. autenticatión / session expired
+          // 1. authentication / session expired
           case 'AUTH_TOKEN_MISSING':
           case 'AUTH_TOKEN_INVALID':
-          case 'AUTH_TOKEN_EXPIRED':
             router.navigate(['/login']);
             break;
+          case 'AUTH_TOKEN_EXPIRED': {
+            const auth = getAuth();
+            const user = auth.currentUser;
+            if (user) {
+              return from(user.getIdToken(true)).pipe(
+                switchMap((newToken) => {
+                  const clonedReq = req.clone({
+                    setHeaders: { Authorization: `Bearer ${newToken}` },
+                  });
+                  return next(clonedReq);
+                }),
+                catchError((renewErr) => {
+                  router.navigate(['/login']);
+                  return throwError(() => renewErr);
+                })
+              );
+            }
+            router.navigate(['/login']);
+            break;
+          }
 
           // 2. role not allowed
           case 'FORBIDDEN_ROLE':
-            alert(typeof apiError.details === 'string' ? apiError.details : apiError.message);
+            messageService.add({
+              severity: 'error',
+              summary: 'Access denied',
+              detail: typeof apiError.details === 'string' ? apiError.details : apiError.message,
+              life: 5000,
+            });
             break;
 
           // 3. Input validation errors
           case 'VALIDATION_ERROR':
-            console.warn('Input validation errors:', apiError.details);
+            console.warn('Errores de validación:', apiError.details);
+            messageService.add({
+              severity: 'warn',
+              summary: 'Invalid data',
+              detail: Array.isArray(apiError.details)
+                ? apiError.details.join(', ')
+                : apiError.message,
+              life: 5000,
+            });
             break;
 
           // 4. Other business or service errors from NestJS catalog
-          case 'PATIENT_NOT_FOUND':
-          case 'PATIENT_ALREADY_EXISTS':
-          case 'OWNER_NOT_FOUND':
-          case 'OWNER_ALREADY_EXISTS':
-          case 'DOG_API_ERROR':
-          case 'RANDOM_USER_ERROR':
-          case 'SEED_NOT_READY':
-          case 'ROUTE_NOT_FOUND':
-          case 'INTERNAL_SERVER_ERROR':
           default:
-            alert(apiError.message);
+            messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: apiError.message || 'Unknown error',
+              life: 5000,
+            });
             break;
         }
+      } else {
+        // 5. Fallback for generic HTTP errors
+        messageService.add({
+          severity: 'error',
+          summary: 'Communication error',
+          detail: 'Could not establish connection with the Vet-Link server.',
+          life: 5000,
+        });
       }
 
       return throwError(() => error);

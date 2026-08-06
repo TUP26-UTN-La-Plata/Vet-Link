@@ -18,6 +18,7 @@ import * as Sentry from '@sentry/angular';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -58,5 +59,6 @@ export const appConfig: ApplicationConfig = {
       deps: [Router],
     },
     ConfirmationService,
+    MessageService,
   ],
 };
