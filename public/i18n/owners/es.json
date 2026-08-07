@@ -13,9 +13,35 @@
     "email": "Email",
     "phone": "Teléfono",
     "location": "Ubicación",
-    "description": "Descripción"
+    "description": "Descripción",
+    "deleteTitle": "Eliminar Propietario",
+    "deleteMessage": "¿Estás seguro de que deseas eliminar a {{ name }}?",
+    "deleteConfirm": "Eliminar",
+    "deleteCancel": "Cancelar"
   },
   "errors": {
     "loadFail": "Lo sentimos, no pudimos cargar la lista de propietarios. Por favor, intenta nuevamente."
+  },
+  "addOwnerModal": {
+    "title": "Agregar Propietario",
+    "name": "Nombre",
+    "email": "Email",
+    "phone": "Teléfono",
+    "city": "Ciudad",
+    "country": "País",
+    "picture": "URL de Foto (Opcional)",
+    "description": "Descripción",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "placeholder": {
+      "name": "Ej: Ana Pérez",
+      "email": "ejemplo@correo.com",
+      "phone": "+54 221 555-0100",
+      "city": "La Plata",
+      "country": "Argentina",
+      "picture": "https://...",
+      "description": "Notas sobre el propietario..."
+    }
   }
 }

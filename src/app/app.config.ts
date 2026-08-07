@@ -9,17 +9,22 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { provideTransloco } from '@jsverse/transloco';
 import { AppTitleStrategy } from './core/strategies/app-title.strategy';
 import { provideServiceWorker } from '@angular/service-worker';
 import * as Sentry from '@sentry/angular';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     providePrimeNG({
       theme: {
         preset: Aura, // O prueba Lara, Nora, etc.
@@ -53,5 +58,7 @@ export const appConfig: ApplicationConfig = {
       provide: Sentry.TraceService,
       deps: [Router],
     },
+    ConfirmationService,
+    MessageService,
   ],
 };

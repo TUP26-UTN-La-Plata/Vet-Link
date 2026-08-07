@@ -1,59 +1,37 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import { DogApiBreed, Patient } from '../../features/patients/patients.interface';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Patient } from '../../features/patients/patients.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PatientsApiService {
-  readonly #API_URL = 'https://api.thedogapi.com/v1/breeds';
-  readonly #API_KEY = 'live_ePinWLFEmQECQTjlVDJ8yZQ6f3j8c92HdxPwQKwMKgO6cEdnoETYF2Q2ojviwcUa';
+  readonly #apiUrl = `${environment.apiUrl}/patients`;
   readonly #http = inject(HttpClient);
 
   getPatients(): Observable<Patient[]> {
-    const headers = new HttpHeaders({
-      'x-api-key': this.#API_KEY,
-    });
-
-    return this.#http
-      .get<DogApiBreed[]>(this.#API_URL, { headers })
-      .pipe(
-        map((apiData: DogApiBreed[]) =>
-          apiData.map((item: DogApiBreed) => this.#mapToPatient(item))
-        )
-      );
+    return this.#http.get<Patient[]>(this.#apiUrl);
   }
 
-  #mapToPatient(item: DogApiBreed): Patient {
-    const imageUrl =
-      item.image?.url ||
-      (item.reference_image_id
-        ? `https://cdn2.thedogapi.com/images/${item.reference_image_id}.jpg`
-        : 'no-image.webp');
-
-    return {
-      id: Number(item.id),
-      name: item.name,
-      image: imageUrl,
-      description:
-        item.description || item.temperament || item.bred_for || 'patients.no_description',
-      averageWeight: this.#calculateAverage(item.weight?.metric),
-      averageHeight: this.#calculateAverage(item.height?.metric),
-      origin: item.origin || 'patients.unknown',
-    };
+  getPatientById(id: string | number): Observable<Patient> {
+    return this.#http.get<Patient>(`${this.#apiUrl}/${id}`);
   }
 
-  #calculateAverage(range?: string): number {
-    if (!range) return 0;
+  createPatient(patient: Partial<Patient>): Observable<Patient> {
+    return this.#http.post<Patient>(this.#apiUrl, patient);
+  }
 
-    const numbers = range.match(/\d+(\.\d+)?/g)?.map(Number);
+  updatePatient(id: string | number, patient: Partial<Patient>): Observable<Patient> {
+    return this.#http.put<Patient>(`${this.#apiUrl}/${id}`, patient);
+  }
 
-    if (!numbers || numbers.length === 0) return 0;
+  patchPatient(id: string | number, changes: Partial<Patient>): Observable<Patient> {
+    return this.#http.patch<Patient>(`${this.#apiUrl}/${id}`, changes);
+  }
 
-    const sum = numbers.reduce((acc, val) => acc + val, 0);
-    const avg = sum / numbers.length;
-
-    return Number(avg.toFixed(0));
+  deletePatient(id: string | number): Observable<void> {
+    return this.#http.delete<void>(`${this.#apiUrl}/${id}`);
   }
 }

@@ -1,23 +1,37 @@
-import { Component, inject, OnInit, HostListener } from '@angular/core';
+import { Component, inject, OnInit, HostListener, effect } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { PrimeNG } from 'primeng/config';
 import { TranslocoService } from '@jsverse/transloco';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import * as Sentry from '@sentry/angular';
+import { UserRoleService } from '@core/services/user-role.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, ToastModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
-  providers: [MessageService],
 })
 export class App implements OnInit {
   #primeng = inject(PrimeNG);
   #translocoService = inject(TranslocoService);
   #messageService = inject(MessageService);
   isOffline = false;
+  readonly #authService = inject(AuthService);
+  readonly #userRoleService = inject(UserRoleService);
+
+  constructor() {
+    // Escucha activamente cuando Firebase confirma el login del usuario
+    effect(() => {
+      if (this.#authService.isLoggedIn()) {
+        this.#userRoleService.fetchMe().subscribe({
+          error: (err) => console.error('Error al obtener perfil:', err),
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.isOffline = !navigator.onLine;

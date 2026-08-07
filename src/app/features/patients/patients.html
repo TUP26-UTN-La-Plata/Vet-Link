@@ -109,7 +109,21 @@
                       <p-card
                         class="h-full border-2 border-neutral/10 shadow-none hover:border-neutral/30 group-hover:scale-105 transition-all duration-300 rounded-2xl overflow-hidden bg-card">
                         <ng-template pTemplate="header">
-                          <div class="flex items-center gap-4 p-4 border-b border-neutral/10">
+                          <div
+                            class="relative flex items-center gap-4 p-4 border-b border-neutral/10">
+                            @if (userRoleService.isVet) {
+                              <button
+                                type="button"
+                                class="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-danger/10 text-danger hover:bg-danger hover:text-white transition-colors cursor-pointer"
+                                [title]="t('card.deleteTitle')"
+                                (click)="
+                                  $event.stopPropagation();
+                                  $event.preventDefault();
+                                  confirmDeletePatient(patient)
+                                ">
+                                <i class="pi pi-trash text-xs"></i>
+                              </button>
+                            }
                             <div class="relative h-44 overflow-hidden border-b border-neutral/10">
                               <img
                                 [src]="patient.image"
@@ -238,4 +252,5 @@
       }
     </div>
   </div>
+  <p-confirmDialog></p-confirmDialog>
 </ng-container>

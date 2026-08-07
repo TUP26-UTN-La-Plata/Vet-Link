@@ -168,19 +168,21 @@
               (click)="goBack()">
               {{ t('detail.cancel') }}
             </button>
-            <button
-              type="submit"
-              class="rounded-full bg-neutral px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral/90"
-              [disabled]="saving">
-              @if (saving) {
-                <span class="flex items-center gap-2">
-                  <i class="pi pi-spin pi-spinner"></i>
-                  {{ t('detail.saving') }}
-                </span>
-              } @else {
-                {{ t('detail.save') }}
-              }
-            </button>
+            @if (userRoleService.isVet) {
+              <button
+                type="submit"
+                class="rounded-full bg-neutral px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral/90"
+                [disabled]="saving">
+                @if (saving) {
+                  <span class="flex items-center gap-2">
+                    <i class="pi pi-spin pi-spinner"></i>
+                    {{ t('detail.saving') }}
+                  </span>
+                } @else {
+                  {{ t('detail.save') }}
+                }
+              </button>
+            }
           </div>
         </form>
       }

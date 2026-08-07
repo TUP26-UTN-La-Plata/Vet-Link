@@ -56,20 +56,21 @@ export class Account implements OnInit {
   });
 
   ngOnInit(): void {
-    this.#profileStateService.loadProfile();
-    const profile = this.#profileStateService.getCurrentProfile();
-
-    this.form.setControl(
-      'phones',
-      this.#fb.array(
-        profile.phones.length
-          ? profile.phones.map((phone, index) => this.#createPhoneControl(phone, index === 0))
-          : [this.#createPhoneControl('', true)]
-      )
-    );
-    this.form.patchValue({
-      address: profile.address,
-      birthDate: profile.birthDate,
+    this.#profileStateService.getProfileFromApi().subscribe({
+      next: (profile) => {
+        this.form.setControl(
+          'phones',
+          this.#fb.array(
+            profile.phones && profile.phones.length
+              ? profile.phones.map((phone, index) => this.#createPhoneControl(phone, index === 0))
+              : [this.#createPhoneControl('', true)]
+          )
+        );
+        this.form.patchValue({
+          address: profile.address || '',
+          birthDate: profile.birthDate || '',
+        });
+      },
     });
   }
 
@@ -104,8 +105,14 @@ export class Account implements OnInit {
       birthDate: this.form.controls.birthDate.value,
     };
 
-    this.#profileStateService.updateProfile(profile);
-    this.#router.navigate(['/settings']);
+    this.#profileStateService.updateProfile(profile).subscribe({
+      next: () => {
+        this.#router.navigate(['/settings']);
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+      },
+    });
   }
 
   protected onCancel(): void {

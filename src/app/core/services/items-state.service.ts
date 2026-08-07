@@ -77,21 +77,48 @@ export class PatientsStateService {
     return this.#patientsSubject.value;
   }
 
-  updatePatient(updatedPatient: Patient): void {
-    const currentPatients = this.#patientsSubject.value;
-    const existingPatientIndex = currentPatients.findIndex(
-      (patient) => patient.id === updatedPatient.id
+  createPatient(newPatient: Partial<Patient>): Observable<Patient> {
+    return this.#patientsApiService.createPatient(newPatient).pipe(
+      tap((created) => {
+        const current = this.#patientsSubject.value;
+        const next = [...current, created];
+        this.#patientsSubject.next(next);
+        this.#localStorageService.save(this.#CACHE_KEY, next, this.#CACHE_TTL);
+      })
     );
+  }
 
-    const nextPatients =
-      existingPatientIndex >= 0
-        ? currentPatients.map((patient) =>
-          patient.id === updatedPatient.id ? updatedPatient : patient
-        )
-        : [...currentPatients, updatedPatient];
+  updatePatient(updatedPatient: Patient): Observable<Patient> {
+    return this.#patientsApiService.updatePatient(updatedPatient.id, updatedPatient).pipe(
+      tap((saved) => {
+        const current = this.#patientsSubject.value;
+        const next = current.map((p) => (p.id === saved.id ? saved : p));
+        this.#patientsSubject.next(next);
+        this.#localStorageService.save(this.#CACHE_KEY, next, this.#CACHE_TTL);
+      })
+    );
+  }
 
-    this.#patientsSubject.next(nextPatients);
-    this.#localStorageService.save(this.#CACHE_KEY, nextPatients, this.#CACHE_TTL);
+  patchPatient(id: string | number, changes: Partial<Patient>): Observable<Patient> {
+    return this.#patientsApiService.patchPatient(id, changes).pipe(
+      tap((patched) => {
+        const current = this.#patientsSubject.value;
+        const next = current.map((p) => (p.id === patched.id ? patched : p));
+        this.#patientsSubject.next(next);
+        this.#localStorageService.save(this.#CACHE_KEY, next, this.#CACHE_TTL);
+      })
+    );
+  }
+
+  deletePatient(id: string | number): Observable<void> {
+    return this.#patientsApiService.deletePatient(id).pipe(
+      tap(() => {
+        const current = this.#patientsSubject.value;
+        const next = current.filter((p) => p.id !== id);
+        this.#patientsSubject.next(next);
+        this.#localStorageService.save(this.#CACHE_KEY, next, this.#CACHE_TTL);
+      })
+    );
   }
 
   getOwners(): Observable<Owner[]> {
@@ -125,6 +152,39 @@ export class PatientsStateService {
     return this.#ownersSubject.value;
   }
 
+  createOwner(newOwner: Omit<Owner, 'id' | 'location'>): Observable<Owner> {
+    return this.#ownersService.createOwner(newOwner).pipe(
+      tap((created) => {
+        const current = this.#ownersSubject.value;
+        const next = [...current, created];
+        this.#ownersSubject.next(next);
+        this.#localStorageService.save(this.#OWNERS_CACHE_KEY, next, this.#CACHE_TTL);
+      })
+    );
+  }
+
+  updateOwner(id: string, updatedOwner: Omit<Owner, 'id' | 'location'>): Observable<Owner> {
+    return this.#ownersService.updateOwner(id, updatedOwner).pipe(
+      tap((saved) => {
+        const current = this.#ownersSubject.value;
+        const next = current.map((o) => (o.id === saved.id ? saved : o));
+        this.#ownersSubject.next(next);
+        this.#localStorageService.save(this.#OWNERS_CACHE_KEY, next, this.#CACHE_TTL);
+      })
+    );
+  }
+
+  deleteOwner(id: string): Observable<void> {
+    return this.#ownersService.deleteOwner(id).pipe(
+      tap(() => {
+        const current = this.#ownersSubject.value;
+        const next = current.filter((o) => o.id !== id);
+        this.#ownersSubject.next(next);
+        this.#localStorageService.save(this.#OWNERS_CACHE_KEY, next, this.#CACHE_TTL);
+      })
+    );
+  }
+
   setOwnerSearchTerm(term: string): void {
     this.#ownersSearchTermSubject.next(term);
   }
@@ -141,8 +201,6 @@ export class PatientsStateService {
     return this.getOwners();
   }
 
-  /* Limpia el caché y el estado actual de pacientes.
-   */
   clearCache(): void {
     this.#localStorageService.remove(this.#CACHE_KEY);
     this.#patientsSubject.next([]);

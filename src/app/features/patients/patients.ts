@@ -16,6 +16,9 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { TranslocoService, TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
 import { AnalyticsService } from '@core/services/analytics.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { UserRoleService } from '@core/services/user-role.service';
 
 @Component({
   selector: 'app-patients',
@@ -33,6 +36,7 @@ import { AnalyticsService } from '@core/services/analytics.service';
     SelectButtonModule,
     PaginatorModule,
     TranslocoModule,
+    ConfirmDialogModule,
   ],
   providers: [PatientsService, provideTranslocoScope('patients')],
   templateUrl: './patients.html',
@@ -82,6 +86,8 @@ export class Patients implements OnInit {
   readonly #destroyRef = inject(DestroyRef);
   readonly #translocoService = inject(TranslocoService);
   readonly #analyticsService = inject(AnalyticsService);
+  readonly #confirmationService = inject(ConfirmationService);
+  readonly userRoleService = inject(UserRoleService);
 
   ngOnInit(): void {
     this.loadData();
@@ -268,5 +274,25 @@ export class Patients implements OnInit {
 
     this.#cd.markForCheck();
     this.#cd.detectChanges();
+  }
+
+  confirmDeletePatient(patient: Patient): void {
+    this.#confirmationService.confirm({
+      message: this.#translocoService.translate('patients.card.deleteMessage', {
+        name: patient.name,
+      }),
+      header: this.#translocoService.translate('patients.card.deleteTitle'),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.#translocoService.translate('patients.card.deleteConfirm'),
+      rejectLabel: this.#translocoService.translate('patients.card.deleteCancel'),
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text p-button-sm',
+      accept: () => {
+        this.#patientsService.deletePatient(patient.id).subscribe({
+          next: () => this.loadData(),
+          error: (err) => console.error('Error deleting patient:', err),
+        });
+      },
+    });
   }
 }
